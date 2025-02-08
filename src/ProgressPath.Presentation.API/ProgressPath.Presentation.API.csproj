@@ -13,6 +13,23 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProgressPath.Application\ProgressPath.Application.csproj" />
+    <ProjectReference Include="..\ProgressPath.Domain\ProgressPath.Domain.csproj" />
+    <ProjectReference Include="..\ProgressPath.Infrastructure\ProgressPath.Infrastructure.csproj" />
+        <PackageReference Include="FluentValidation" Version="11.10.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Routes\" />
+    <Folder Include="Validators\" />
+    <Folder Include="Validators\Commands\" />
+    <Folder Include="Validators\Queries\" />
   </ItemGroup>
 
 </Project>

@@ -14,4 +14,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CQRS\" />
+    <Folder Include="CQRS\CommandHandlers\" />
+    <Folder Include="CQRS\Commands\" />
+    <Folder Include="CQRS\Queries\" />
+    <Folder Include="CQRS\QueryHandlers\" />
+  </ItemGroup>
+
 </Project>
