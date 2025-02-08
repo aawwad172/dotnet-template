@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProgressPath.Application\ProgressPath.Application.csproj" />
+    <ProjectReference Include="..\ProgressPath.Domain\ProgressPath.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
