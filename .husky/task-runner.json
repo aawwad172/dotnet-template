@@ -1,0 +1,27 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+     {
+       "name": "dotnet-format",
+       "group": "pre-commit",
+       "command": "dotnet",
+       "args": ["format", "--include", "${staged}"],
+       "include": ["**/*.cs"]
+     },
+     {
+       "name": "dotnet-clean",
+       "command": "dotnet",
+       "group": "pre-push",
+       "args": ["clean"],
+       "include": ["**/*.cs"]
+     },
+     {
+       "name": "dotnet-build-with-warning-check",
+       "command": "dotnet",
+       "group": "pre-push",
+       "args": ["build", "/p:TreatWarningsAsErrors=true"],
+       "include": ["**/*.cs"]
+     }
+   ]
+ }
+ 

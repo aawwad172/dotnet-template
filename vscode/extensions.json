@@ -1,0 +1,8 @@
+// .vscode/extensions.json
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "rvest.vs-code-prettier-eslint",
+    "editorconfig.editorconfig"
+  ]
+}
