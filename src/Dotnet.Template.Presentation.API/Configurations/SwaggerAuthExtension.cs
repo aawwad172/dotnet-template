@@ -1,5 +1,5 @@
 using Microsoft.OpenApi.Models;
-namespace ProgressPath.Presentation.API.Configurations;
+namespace Dotnet.Template.Presentation.API.Configurations;
 
 public static class SwaggerAuthExtension
 {

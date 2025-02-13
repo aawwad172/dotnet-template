@@ -5,13 +5,13 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{342EDB7A-ED24-4DD9-822C-9374321A8CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressPath.Presentation.API", "src\ProgressPath.Presentation.API\ProgressPath.Presentation.API.csproj", "{8F345AF8-127D-4E6E-83BE-0CB29263FF41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnet.Template.Presentation.API", "src\Dotnet.Template.Presentation.API\Dotnet.Template.Presentation.API.csproj", "{8F345AF8-127D-4E6E-83BE-0CB29263FF41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressPath.Application", "src\ProgressPath.Application\ProgressPath.Application.csproj", "{2BACEB28-B32A-4D49-868F-D452F527FE5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnet.Template.Application", "src\Dotnet.Template.Application\Dotnet.Template.Application.csproj", "{2BACEB28-B32A-4D49-868F-D452F527FE5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressPath.Domain", "src\ProgressPath.Domain\ProgressPath.Domain.csproj", "{2ADE26C3-D97F-43F1-AFC8-9213108F54B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnet.Template.Domain", "src\Dotnet.Template.Domain\Dotnet.Template.Domain.csproj", "{2ADE26C3-D97F-43F1-AFC8-9213108F54B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressPath.Infrastructure", "src\ProgressPath.Infrastructure\ProgressPath.Infrastructure.csproj", "{0212B1F1-C0BB-420B-A6FB-C4C26552A253}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotnet.Template.Infrastructure", "src\Dotnet.Template.Infrastructure\Dotnet.Template.Infrastructure.csproj", "{0212B1F1-C0BB-420B-A6FB-C4C26552A253}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
