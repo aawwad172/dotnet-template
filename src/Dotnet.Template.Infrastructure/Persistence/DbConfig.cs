@@ -1,7 +1,5 @@
 using Dotnet.Template.Domain.Exceptions;
 
-using Microsoft.Extensions.Configuration;
-
 namespace Dotnet.Template.Infrastructure.Persistence;
 
 /// <summary>
@@ -18,5 +16,8 @@ public class DbConfig
     /// <exception cref="EnvironmentVariableNotSetException">
     /// Thrown when an expected environment variable is not set.
     /// </exception>
-    public static string GetDBConnectionString() => $"Host={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_HOST")};Port={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_PORT")};Database={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_NAME")};Username={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_USER")};Password={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_PASSWORD")}";
+
+    // public static string GetDBConnectionString() => $"Host={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_HOST")};Port={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_PORT")};Database={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_NAME")};Username={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_USER")};Password={EnvironmentVariableExtensions.GetRequiredEnvVariable("DB_PASSWORD")}";
+
+    public static string GetDBConnectionString() => $"Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres";
 }

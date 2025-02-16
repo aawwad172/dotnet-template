@@ -5,17 +5,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
 
-public abstract class BaseDbContext : DbContext
+public class BaseDbContext : DbContext
 {
-    protected IServiceProvider ServiceProvider { get; }
+    protected IServiceProvider _serviceProvider { get; }
 
     // Logger service
-    private ILogger<BaseDbContext> Logger => ServiceProvider.GetRequiredService<ILogger<BaseDbContext>>();
+    private ILogger<BaseDbContext> Logger => _serviceProvider.GetRequiredService<ILogger<BaseDbContext>>();
 
-    protected BaseDbContext(DbContextOptions options, IServiceProvider serviceProvider)
-        : base(options)
+    public BaseDbContext(DbContextOptions options, IServiceProvider serviceProvider) : base(options)
     {
-        ServiceProvider = serviceProvider;
+        _serviceProvider = serviceProvider;
     }
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
