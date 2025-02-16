@@ -15,10 +15,10 @@ public class JwtService(IConfiguration configuration) : IJwtService
     private readonly IConfiguration _configuration = configuration;
     public string GenerateToken(IEnumerable<Claim> claims, DateTime expires)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:Key")));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:Key")));
+        SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
+        JwtSecurityToken token = new JwtSecurityToken(
             issuer: _configuration.GetRequiredSetting("Jwt:Issuer"),
             audience: _configuration.GetRequiredSetting("Jwt:Audience"),
             claims: claims,
