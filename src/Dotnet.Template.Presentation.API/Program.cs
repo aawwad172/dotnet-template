@@ -1,13 +1,13 @@
 using Dotnet.Template.Application;
+using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain;
 using Dotnet.Template.Infrastructure;
-using Dotnet.Template.Infrastructure.Persistence;
 using Dotnet.Template.Presentation.API.Configurations;
 using Dotnet.Template.Presentation.API.Middlewares;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHealthChecks().AddNpgSql(DbConfig.GetDBConnectionString()!);
+builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetRequiredSetting("ConnectionStrings:DbConnectionString"));
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -16,7 +16,7 @@ builder.Services.AddSwaggerAuth();
 
 builder.Services.AddDomain()
                 .AddApplication()
-                .AddInfrastructure();
+                .AddInfrastructure(builder.Configuration);
 
 WebApplication app = builder.Build();
 
