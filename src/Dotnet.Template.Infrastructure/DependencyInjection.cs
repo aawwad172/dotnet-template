@@ -10,10 +10,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddHttpClient<HttpClient>();
-        services.AddDbContext<BaseDbContext>((provider, options) => options.UseNpgsql(DbConfig.GetDBConnectionString()));
+        string connectionString = DbConfig.GetDBConnectionString()!;
+
+        services.AddDbContext<BaseDbContext>((provider, options) => options.UseNpgsql(connectionString));
         // Add your repositories like this here
         // services.AddScoped<IRepository, Repository>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddLogging();
 
