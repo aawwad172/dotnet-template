@@ -1,8 +1,8 @@
+using Dotnet.Template.Domain.Interfaces.IRepositories;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-
-using Dotnet.Template.Domain.Interfaces.IRepositories;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
 
