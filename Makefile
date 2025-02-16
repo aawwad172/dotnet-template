@@ -1,6 +1,10 @@
 # Set default shell
 SHELL := /bin/bash
 
+rename-project:
+	@echo "Executing rename script with name: $(name)"
+	scripts/./rename_dotnet_template.sh $(name)
+
 # Run the API project
 run:
 	dotnet run --project src/Dotnet.Template.Presentation.API
