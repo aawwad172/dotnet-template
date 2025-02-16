@@ -17,7 +17,7 @@ public static class ConfigurationExtensions
     public static string GetRequiredSetting(this IConfiguration configuration, string key)
     {
         // Try to get the value from the configuration (e.g., appsettings.json)
-        var value = configuration[key];
+        string? value = configuration[key];
         if (string.IsNullOrWhiteSpace(value))
         {
             // Fallback to environment variables if not found in configuration

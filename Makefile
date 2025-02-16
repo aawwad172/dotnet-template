@@ -25,3 +25,6 @@ clean:
 migrate:
 	dotnet ef migrations add $(name) --project src/Dotnet.Template.Infrastructure --startup-project src/Dotnet.Template.Presentation.API
 	dotnet ef database update --project src/Dotnet.Template.Infrastructure --startup-project src/Dotnet.Template.Presentation.API
+
+update-database:
+    dotnet ef database update --project src/Dotnet.Template.Infrastructure --startup-project src/Dotnet.Template.Presentation.API
