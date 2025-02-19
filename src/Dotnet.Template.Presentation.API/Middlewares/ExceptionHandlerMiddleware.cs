@@ -32,6 +32,16 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
             _logger.LogWarning("ValidationException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "VALIDATION_ERROR", ex.Message, StatusCodes.Status400BadRequest);
         }
+        catch (UnauthenticatedException ex)
+        {
+            _logger.LogWarning("UnauthenticatedException occurred: {Message}", ex.Message);
+            await HandleExceptionAsync(context, "UNAUTHENTICATED", ex.Message, StatusCodes.Status401Unauthorized);
+        }
+        catch (UnauthorizedException ex)
+        {
+            _logger.LogWarning("UnauthorizedException occurred: {Message}", ex.Message);
+            await HandleExceptionAsync(context, "UNAUTHORIZED", ex.Message, StatusCodes.Status401Unauthorized);
+        }
         catch (Exception ex)
         {
             _logger.LogError("An unexpected error occurred: {Message}", ex.Message);

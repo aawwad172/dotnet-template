@@ -1,21 +1,25 @@
+using Dotnet.Template.Domain.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
-
-public class BaseDbContext : DbContext
+public class BaseDbContext(DbContextOptions options, IServiceProvider serviceProvider) : DbContext(options)
 {
-    protected IServiceProvider _serviceProvider { get; }
+    protected IServiceProvider _serviceProvider { get; } = serviceProvider;
+
+    public DbSet<User> Users { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
 
     // Logger service
     private ILogger<BaseDbContext> Logger => _serviceProvider.GetRequiredService<ILogger<BaseDbContext>>();
-
-    public BaseDbContext(DbContextOptions options, IServiceProvider serviceProvider) : base(options)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {

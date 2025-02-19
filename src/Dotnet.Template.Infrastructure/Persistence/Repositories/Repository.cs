@@ -37,9 +37,10 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task AddAsync(T entity)
+    public async Task<T> AddAsync(T entity)
     {
-        await _dbSet.AddAsync(entity);
+        var result = await _dbSet.AddAsync(entity);
+        return result.Entity;
     }
 
     public async Task DeleteAsync(Ulid id)
@@ -51,12 +52,13 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet.Remove(entity);
     }
 
-    public async Task UpdateAsync(Ulid id)
+    public async Task<T> UpdateAsync(Ulid id)
     {
         T? entity = await _dbSet.FindAsync(id);
         if (entity is null)
             throw new NotFoundException($"The Record for Entity of type {typeof(T).Name} was not found.");
 
-        _dbSet.Update(entity);
+        var result = _dbSet.Update(entity);
+        return result.Entity;
     }
 }

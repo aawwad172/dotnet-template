@@ -11,7 +11,7 @@ public interface IRepository<T> where T : class
         int? pageNumber,
         int? pageSize,
         Expression<Func<T, bool>>? filter);
-    Task AddAsync(T entity);
-    Task UpdateAsync(Ulid id);
+    Task<T> AddAsync(T entity);
+    Task<T> UpdateAsync(Ulid id);
     Task DeleteAsync(Ulid id);
 }

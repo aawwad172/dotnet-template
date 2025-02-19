@@ -24,7 +24,6 @@
     <Folder Include="CQRS\Commands\" />
     <Folder Include="CQRS\Queries\" />
     <Folder Include="CQRS\QueryHandlers\" />
-    <Folder Include="DTOs\" />
   </ItemGroup>
 
 </Project>

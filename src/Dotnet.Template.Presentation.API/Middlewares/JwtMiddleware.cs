@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-using Dotnet.Template.Application.Interfaces;
+using Dotnet.Template.Application.Interfaces.Services;
 
 namespace Dotnet.Template.Presentation.API.Middlewares;
 
@@ -33,10 +33,10 @@ public class JwtMiddleware
 
         if (!string.IsNullOrEmpty(token))
         {
-            ClaimsPrincipal principal = _jwtService.ValidateToken(token);
-            if (principal != null)
+            Task<ClaimsPrincipal>? result = _jwtService.ValidateToken(token);
+            if (result is not null)
             {
-                context.User = principal;
+                context.User = result.Result;
             }
         }
 
