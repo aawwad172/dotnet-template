@@ -1,3 +1,5 @@
+using System.Security.Authentication;
+
 using Dotnet.Template.Application.Interfaces.Services;
 using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Entities;
@@ -8,53 +10,115 @@ using Microsoft.Extensions.Configuration;
 
 namespace Dotnet.Template.Application.HelperServices;
 
-public sealed class AuthenticationService(IUserRepository userRepository, IRepository<RefreshToken> refreshTokenRepository, IJwtService jwtService, IEncryptionService encryptionService, IConfiguration configuration, IUnitOfWork unitOfWork) : IAuthenticationService
+public sealed class AuthenticationService(
+    IUserRepository userRepository,
+    IRefreshTokenRepository refreshTokenRepository,
+    IJwtService jwtService,
+    IEncryptionService encryptionService,
+    IUnitOfWork unitOfWork) : IAuthenticationService
 {
     private readonly IUserRepository _userRepository = userRepository;
-    private readonly IRepository<RefreshToken> _refreshTokenRepository = refreshTokenRepository;
+    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
     private readonly IJwtService _jwtService = jwtService;
     private readonly IEncryptionService _encryptionService = encryptionService;
-    private readonly IConfiguration _configuration = configuration;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
 
     public async Task<(string AccessToken, string RefreshToken)> AuthenticateUserAsync(string email, string password)
     {
-        // Todo: Consider using the UnitOfWork pattern to manage transactions
-        User? user = await _userRepository.GetUserByEmailAsync(email);
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            User? user = await _userRepository.GetUserByEmailAsync(email);
+            if (user is null)
+                throw new NotFoundException("User not found");
 
+            if (!_encryptionService.VerifyPassword(password, user.PasswordHash))
+                throw new UnauthenticatedException("Invalid password");
+
+            string accessToken = _jwtService.GenerateAccessToken(user);
+
+            RefreshToken refreshToken = _jwtService.GenerateRefreshToken(user);
+
+            _ = await _refreshTokenRepository.AddAsync(refreshToken);
+
+            await _unitOfWork.SaveAsync();
+            await _unitOfWork.CommitAsync();
+
+            return (accessToken, refreshToken.Token);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw new AuthenticationException("Invalid email or password");
+        }
+    }
+
+    public async Task LogoutAsync(string refreshToken)
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            string hashedToken = _encryptionService.Hash(refreshToken);
+
+            RefreshToken? token = await _refreshTokenRepository.GetByTokenAsync(hashedToken);
+
+            if (token is not null)
+                token.Revoked = DateTime.UtcNow;
+
+            // Update the token entity in the repository.
+            await _refreshTokenRepository.UpdateAsync(token!);
+
+            await _unitOfWork.SaveAsync();
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<(string AccessToken, string RefreshToken)> RefreshAccessTokenAsync(string refreshToken)
+    {
+        string hashedToken = _encryptionService.Hash(refreshToken);
+
+        RefreshToken? token = await _refreshTokenRepository.GetByTokenAsync(hashedToken);
+
+        if (token is null || !token.IsActive)
+            throw new UnauthenticatedException("Invalid or expired refresh token.");
+
+
+        User? user = await _userRepository.GetByIdAsync(token.UserId);
         if (user is null)
-        {
             throw new NotFoundException("User not found");
-        }
 
-        if (!_encryptionService.VerifyPassword(password, user.PasswordHash))
+        await _unitOfWork.BeginTransactionAsync();
+        try
         {
-            throw new UnauthenticatedException("Invalid password");
+            token.Revoked = DateTime.UtcNow;
+            await _refreshTokenRepository.UpdateAsync(token);
+
+            //  Generate a new refresh token
+            RefreshToken newRefreshToken = _jwtService.GenerateRefreshToken(user);
+
+            // Add the new refresh token to the repository
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+
+            // Generate a new access token with desired expiration
+            string newAccessToken = _jwtService.GenerateAccessToken(user);
+
+            // Save all changes and commit the transaction
+            await _unitOfWork.SaveAsync();
+            await _unitOfWork.CommitAsync();
+
+            // Return the new tokens to the client
+            return (newAccessToken, newRefreshToken.Token);
         }
-
-        string accessToken = _jwtService.GenerateToken(user, DateTime.UtcNow.AddMinutes(int.Parse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"))));
-
-        string refreshTokenValue = _jwtService.GenerateRefreshToken();
-
-        RefreshToken refreshToken = await _refreshTokenRepository.AddAsync(new RefreshToken
+        catch (Exception)
         {
-            Token = refreshTokenValue,
-            UserId = user.Id,
-            Expires = DateTime.UtcNow.AddDays(int.Parse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"))),
-            CreatedAt = DateTime.UtcNow,
-        });
-
-        return (accessToken, refreshToken.Token);
-    }
-
-    public Task LogoutAsync(string refreshToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<(string AccessToken, string RefreshToken)> RefreshAccessTokenAsync(string refreshToken)
-    {
-        throw new NotImplementedException();
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 }

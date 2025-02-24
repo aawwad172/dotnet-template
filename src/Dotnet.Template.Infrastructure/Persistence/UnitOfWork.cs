@@ -12,8 +12,9 @@ public class UnitOfWork(BaseDbContext context, ILogger<UnitOfWork> logger) : IUn
     private readonly ILogger<UnitOfWork> _logger = logger;
     private IDbContextTransaction? _transaction;
 
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken)
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
+        // If a transaction is already active, do nothing
         if (_transaction is null)
         {
             _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -21,7 +22,7 @@ public class UnitOfWork(BaseDbContext context, ILogger<UnitOfWork> logger) : IUn
         }
     }
 
-    public async Task<int> SaveAsync(CancellationToken cancellationToken)
+    public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -36,7 +37,7 @@ public class UnitOfWork(BaseDbContext context, ILogger<UnitOfWork> logger) : IUn
         }
     }
 
-    public async Task CommitAsync(CancellationToken cancellationToken)
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
         if (_transaction is not null)
         {
@@ -47,7 +48,7 @@ public class UnitOfWork(BaseDbContext context, ILogger<UnitOfWork> logger) : IUn
         }
     }
 
-    public async Task RollbackAsync(CancellationToken cancellationToken)
+    public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
         if (_transaction is not null)
         {

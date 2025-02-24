@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 using Dotnet.Template.Application.Interfaces.Services;
@@ -16,12 +17,12 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
     private readonly IConfiguration _configuration = configuration;
     private readonly IEncryptionService _encryptionService = encryptionService;
 
-    public string GenerateToken(User user, DateTime expires)
+    public string GenerateAccessToken(User user)
     {
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:JwtSecretKey")));
         SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(
             [
@@ -30,27 +31,26 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Ulid.NewUlid().ToString())
             ]),
-            Expires = expires,
+            Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"))),
             SigningCredentials = creds,
             Issuer = _configuration.GetRequiredSetting("Jwt:Issuer"),
             Audience = _configuration.GetRequiredSetting("Jwt:Audience")
         };
 
-
-        JsonWebTokenHandler? handler = new JsonWebTokenHandler();
+        JsonWebTokenHandler handler = new JsonWebTokenHandler();
 
         return handler.CreateToken(tokenDescriptor);
     }
 
-    public string GenerateRefreshToken()
+    public RefreshToken GenerateRefreshToken(User user)
     {
-        return _encryptionService.GenerateRandomString();
-    }
-
-    public bool VerifyRefreshToken(string refreshToken, string storedHash)
-    {
-        string hashedInput = _encryptionService.Hash(refreshToken);
-        return storedHash == hashedInput;
+        return new RefreshToken
+        {
+            Token = GenerateRefreshToken(),
+            UserId = user.Id,
+            Expires = DateTime.UtcNow.AddDays(int.Parse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"))),
+            CreatedAt = DateTime.UtcNow
+        };
     }
 
     public async Task<ClaimsPrincipal> ValidateToken(string token)
@@ -69,7 +69,19 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
             ClockSkew = TimeSpan.Zero
         };
 
-        var result = await tokenHandler.ValidateTokenAsync(token, validationParameters);
+        TokenValidationResult result = await tokenHandler.ValidateTokenAsync(token, validationParameters);
         return result.IsValid ? new ClaimsPrincipal(result.ClaimsIdentity) : null!;
     }
+
+    #region Private Helper Methods
+    private string GenerateRefreshToken()
+    {
+        byte[] randomBytes = new byte[32]; // 256-bit secure random token
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomBytes);
+        }
+        return Convert.ToBase64String(randomBytes); // Base64 encoded string
+    }
+    #endregion
 }

@@ -1,6 +1,8 @@
 ﻿using Dotnet.Template.Application.HelperServices;
 using Dotnet.Template.Application.Interfaces.Services;
 
+using MapsterMapper;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dotnet.Template.Application;
@@ -14,6 +16,7 @@ public static class DependencyInjection
         //     // cfg.RegisterServicesFromAssembly(typeof(Your_Query_Handler_Here).Assembly);
         // });
         services.AddSingleton<IEncryptionService, EncryptionService>();
+        services.AddSingleton<IMapper, Mapper>();
 
         return services;
     }

@@ -22,8 +22,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
             .IsRequired();
 
         builder.Property(refreshToken => refreshToken.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("NOW()");
+            .IsRequired();
 
         builder.Property(refreshToken => refreshToken.CreatedBy)
             .IsRequired()

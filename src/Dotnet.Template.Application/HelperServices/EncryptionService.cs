@@ -11,23 +11,39 @@ namespace Dotnet.Template.Application.HelperServices;
 public class EncryptionService(IConfiguration configuration) : IEncryptionService
 {
     private readonly byte[] _encryptionKey = Encoding.UTF8.GetBytes(configuration.GetRequiredSetting("EncryptionKey"));
+    private const int SaltSize = 16;
+    private const int HashSize = 32;
+    private const int Iterations = 100000;
+    private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA512;
 
-    // Todo: Consider adding the Salt Method to the Hashed Password
     public string Hash(string input)
     {
-        using var sha256 = SHA256.Create();
+        using SHA256 sha256 = SHA256.Create();
         byte[] bytes = Encoding.UTF8.GetBytes(input);
         byte[] hash = sha256.ComputeHash(bytes);
         return Convert.ToBase64String(hash);
     }
 
+    public string HashPassword(string password)
+    {
+        byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
+        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
+            password: password,
+            salt: salt,
+            iterations: Iterations,
+            hashAlgorithm: Algorithm,
+            outputLength: HashSize);
+
+        return $"{Convert.ToHexString(hash)}-{Convert.ToHexString(salt)}";
+    }
+
     public string EncryptString(string text)
     {
-        using var aes = Aes.Create();
+        using Aes aes = Aes.Create();
         aes.Key = _encryptionKey;
         aes.GenerateIV();
 
-        using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+        using ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
         byte[] plainBytes = Encoding.UTF8.GetBytes(text);
         byte[] encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 
@@ -42,7 +58,7 @@ public class EncryptionService(IConfiguration configuration) : IEncryptionServic
     {
         byte[] cipherBytes = Convert.FromBase64String(cipherText);
 
-        using var aes = Aes.Create();
+        using Aes aes = Aes.Create();
         aes.Key = _encryptionKey;
 
         byte[] iv = new byte[aes.BlockSize / 8];
@@ -52,25 +68,24 @@ public class EncryptionService(IConfiguration configuration) : IEncryptionServic
         Buffer.BlockCopy(cipherBytes, iv.Length, encryptedData, 0, encryptedData.Length);
 
         aes.IV = iv;
-        using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+        using ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
         byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
 
         return Encoding.UTF8.GetString(decryptedBytes);
     }
 
-    public string GenerateRandomString()
-    {
-        byte[] randomBytes = new byte[32]; // 256-bit secure random token
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(randomBytes);
-        }
-        return Convert.ToBase64String(randomBytes); // Base64 encoded string
-    }
-
     public bool VerifyPassword(string password, string passwordHash)
     {
-        var result = Hash(password);
-        return result == passwordHash;
+        string[] parts = passwordHash.Split('-');
+        byte[] hash = Convert.FromHexString(parts[0]);
+        byte[] salt = Convert.FromHexString(parts[1]);
+        byte[] inputHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, Algorithm, HashSize);
+
+        return CryptographicOperations.FixedTimeEquals(hash, inputHash);
+    }
+
+    public bool VerifyHash(string input, string hashedInput)
+    {
+        return Hash(input) == hashedInput;
     }
 }

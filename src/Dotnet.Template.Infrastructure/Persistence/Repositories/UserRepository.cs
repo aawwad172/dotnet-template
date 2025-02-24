@@ -10,15 +10,13 @@ public sealed class UserRepository(BaseDbContext dbContext) : Repository<User>(d
 {
     private readonly DbSet<User> _dbSet = dbContext.Set<User>();
 
-    public Task<User> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        Task<User?>? user = _dbSet.FirstOrDefaultAsync(user => user.Email == email);
+        User? user = await _dbSet.FirstOrDefaultAsync(user => user.Email == email);
 
-        if (user is null)
-        {
-            throw new NotFoundException("User not found");
-        }
+        if (user is not null)
+            return user;
 
-        return user!;
+        return null;
     }
 }
