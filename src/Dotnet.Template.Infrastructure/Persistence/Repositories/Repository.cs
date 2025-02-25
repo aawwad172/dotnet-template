@@ -71,6 +71,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
             return null;
 
         // Otherwise, update the entity.
+        _context.Entry(existingEntity).State = EntityState.Detached;
         EntityEntry<T> result = _dbSet.Update(entity);
         return result.Entity;
     }

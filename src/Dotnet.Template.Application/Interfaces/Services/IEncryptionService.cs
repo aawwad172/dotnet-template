@@ -22,6 +22,12 @@ public interface IEncryptionService
     /// </summary>
     /// <param name="password">The password to hash.</param>
     /// <returns>The password hash with embedded salt.</returns>
+    /// <remarks>
+    /// Implementation requirements:
+    /// - Use a strong adaptive hashing algorithm (e.g., Argon2, PBKDF2, or BCrypt)
+    /// - Generate a unique cryptographic salt per password
+    /// - Enforce minimum password length and complexity
+    /// </remarks>
     public string HashPassword(string password);
 
     /// <summary>
@@ -37,6 +43,12 @@ public interface IEncryptionService
     /// </summary>
     /// <param name="text">The text to encrypt.</param>
     /// <returns>The encrypted string.</returns>
+    /// <remarks>
+    /// Implementation requirements:
+    /// - Use AES-256 or equivalent strength encryption
+    /// - Implement proper key management and rotation
+    /// - Use secure modes of operation (e.g., CBC with PKCS7 padding)
+    /// </remarks>
     public string EncryptString(string text);
 
     /// <summary>
