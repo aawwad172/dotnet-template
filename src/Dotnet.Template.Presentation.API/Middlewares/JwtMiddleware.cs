@@ -10,16 +10,14 @@ namespace Dotnet.Template.Presentation.API.Middlewares;
 /// <remarks>
 /// Make sure to update the configuration settings for "Jwt:JwtSecretKey", "Jwt:JwtIssuer", and "Jwt:JwtAudience" as needed.
 /// </remarks>
-public class JwtMiddleware
+public class JwtMiddleware(
+    RequestDelegate next,
+    IJwtService jwtService,
+    ILogger<JwtMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly IJwtService _jwtService;
-
-    public JwtMiddleware(RequestDelegate next, IJwtService jwtService)
-    {
-        _next = next;
-        _jwtService = jwtService;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly IJwtService _jwtService = jwtService;
+    private readonly ILogger<JwtMiddleware> _logger = logger;
 
     /// <summary>
     /// Invokes the middleware to validate the JWT token from the request header and attach the user to the context.
@@ -33,10 +31,16 @@ public class JwtMiddleware
 
         if (!string.IsNullOrEmpty(token))
         {
-            Task<ClaimsPrincipal>? result = _jwtService.ValidateToken(token);
-            if (result is not null)
+            try
             {
-                context.User = result.Result;
+                Task<ClaimsPrincipal>? result = _jwtService.ValidateToken(token);
+                if (result is not null)
+                    context.User = await result;
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't throw to allow the request to continue
+                _logger.LogError(ex, "Failed to validate JWT token");
             }
         }
 

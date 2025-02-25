@@ -8,8 +8,6 @@ namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
 public sealed class UserRepository(BaseDbContext dbContext) : Repository<User>(dbContext), IUserRepository
 {
-    private readonly DbSet<User> _dbSet = dbContext.Set<User>();
-
     public async Task<User?> GetUserByEmailAsync(string email)
     {
         User? user = await _dbSet.FirstOrDefaultAsync(user => user.Email == email);

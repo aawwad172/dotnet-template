@@ -39,38 +39,53 @@ public class EncryptionService(IConfiguration configuration) : IEncryptionServic
 
     public string EncryptString(string text)
     {
-        using Aes aes = Aes.Create();
-        aes.Key = _encryptionKey;
-        aes.GenerateIV();
+        using AesGcm aesGcm = new AesGcm(_encryptionKey, AesGcm.TagByteSizes.MaxSize);
+        byte[] nonce = new byte[AesGcm.NonceByteSizes.MaxSize];
+        RandomNumberGenerator.Fill(nonce);
 
-        using ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
         byte[] plainBytes = Encoding.UTF8.GetBytes(text);
-        byte[] encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
+        byte[] cipherBytes = new byte[plainBytes.Length];
+        byte[] tag = new byte[AesGcm.TagByteSizes.MaxSize];
 
-        byte[] result = new byte[aes.IV.Length + encryptedBytes.Length];
-        Buffer.BlockCopy(aes.IV, 0, result, 0, aes.IV.Length);
-        Buffer.BlockCopy(encryptedBytes, 0, result, aes.IV.Length, encryptedBytes.Length);
+        aesGcm.Encrypt(nonce, plainBytes, cipherBytes, tag);
+
+        // Combine nonce, tag, and ciphertext into one array for storage or transmission.
+        byte[] result = new byte[nonce.Length + tag.Length + cipherBytes.Length];
+        Buffer.BlockCopy(nonce, 0, result, 0, nonce.Length);
+        Buffer.BlockCopy(tag, 0, result, nonce.Length, tag.Length);
+        Buffer.BlockCopy(cipherBytes, 0, result, nonce.Length + tag.Length, cipherBytes.Length);
 
         return Convert.ToBase64String(result);
     }
 
-    public string DecryptString(string cipherText)
+    public string DecryptString(string encryptedText)
     {
-        byte[] cipherBytes = Convert.FromBase64String(cipherText);
+        // Convert the Base64-encoded input back into bytes
+        byte[] encryptedData = Convert.FromBase64String(encryptedText);
 
-        using Aes aes = Aes.Create();
-        aes.Key = _encryptionKey;
+        // Define the sizes of the nonce and tag based on AES-GCM specifications
+        int nonceLength = AesGcm.NonceByteSizes.MaxSize; // Typically 12 bytes
+        int tagLength = AesGcm.TagByteSizes.MaxSize;       // Typically 16 bytes
 
-        byte[] iv = new byte[aes.BlockSize / 8];
-        byte[] encryptedData = new byte[cipherBytes.Length - iv.Length];
+        // Allocate buffers for nonce, tag, and ciphertext
+        byte[] nonce = new byte[nonceLength];
+        byte[] tag = new byte[tagLength];
+        byte[] ciphertext = new byte[encryptedData.Length - nonceLength - tagLength];
 
-        Buffer.BlockCopy(cipherBytes, 0, iv, 0, iv.Length);
-        Buffer.BlockCopy(cipherBytes, iv.Length, encryptedData, 0, encryptedData.Length);
+        // Extract the nonce (first part)
+        Buffer.BlockCopy(encryptedData, 0, nonce, 0, nonceLength);
+        // Extract the tag (next part)
+        Buffer.BlockCopy(encryptedData, nonceLength, tag, 0, tagLength);
+        // Extract the ciphertext (remaining bytes)
+        Buffer.BlockCopy(encryptedData, nonceLength + tagLength, ciphertext, 0, ciphertext.Length);
 
-        aes.IV = iv;
-        using ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-        byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+        byte[] decryptedBytes = new byte[ciphertext.Length];
 
+        // Use AesGcm to decrypt; it will verify the tag automatically
+        using AesGcm aesGcm = new AesGcm(_encryptionKey, AesGcm.TagByteSizes.MaxSize);
+        aesGcm.Decrypt(nonce, ciphertext, tag, decryptedBytes);
+
+        // Convert the decrypted bytes to a UTF8 string and return it
         return Encoding.UTF8.GetString(decryptedBytes);
     }
 

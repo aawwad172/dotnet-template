@@ -49,7 +49,8 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
             Token = GenerateRefreshToken(),
             UserId = user.Id,
             Expires = DateTime.UtcNow.AddDays(int.Parse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"))),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = user.Id
         };
     }
 
@@ -81,7 +82,7 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
         {
             rng.GetBytes(randomBytes);
         }
-        return Convert.ToBase64String(randomBytes); // Base64 encoded string
+        return _encryptionService.Hash(Convert.ToBase64String(randomBytes));
     }
     #endregion
 }
