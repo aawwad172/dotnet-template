@@ -12,6 +12,8 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
     {
         builder.HasKey(refreshToken => refreshToken.Id);
 
+        builder.Property(refreshToken => refreshToken.Id).HasConversion(UlidToStringConvertor.Instance);
+
         builder.Property(refreshToken => refreshToken.Token)
             .IsRequired();
 

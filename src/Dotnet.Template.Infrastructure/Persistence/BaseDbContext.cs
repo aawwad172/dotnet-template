@@ -1,4 +1,5 @@
 using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Infrastructure.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -15,6 +16,9 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);
+
+        modelBuilder.RegisterPostgresEnums();
+
         base.OnModelCreating(modelBuilder);
     }
 

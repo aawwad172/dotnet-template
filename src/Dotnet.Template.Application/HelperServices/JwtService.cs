@@ -26,9 +26,11 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
         {
             Subject = new ClaimsIdentity(
             [
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Name, user.FirstName + " " + user.LastName),
+                new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Ulid.NewUlid().ToString())
             ]),
             Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"))),
@@ -44,7 +46,7 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
 
     public RefreshToken GenerateRefreshToken(User user)
     {
-        return new RefreshToken
+        RefreshToken refreshToken = new RefreshToken
         {
             Token = GenerateRefreshToken(),
             UserId = user.Id,
@@ -52,6 +54,10 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
             CreatedAt = DateTime.UtcNow,
             CreatedBy = user.Id
         };
+
+        user.RefreshTokens.Add(refreshToken);
+
+        return refreshToken;
     }
 
     public async Task<ClaimsPrincipal> ValidateToken(string token)

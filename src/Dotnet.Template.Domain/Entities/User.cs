@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+using Dotnet.Template.Domain.Enums;
 using Dotnet.Template.Domain.Interfaces;
 using Dotnet.Template.Domain.Interfaces.Auditing;
 namespace Dotnet.Template.Domain.Entities;
@@ -18,4 +19,5 @@ public record User : IEntity, ICreationAudit, IModificationAudit
     public DateTime UpdatedAt { get; set; }
     public required Ulid UpdatedBy { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public RolesEnum Role { get; set; }
 }

@@ -1,6 +1,4 @@
-using Dotnet.Template.Application.HelperServices;
 using Dotnet.Template.Application.Interfaces.Services;
-using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Infrastructure.Convertors;
 
@@ -10,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Dotnet.Template.Infrastructure.Configurations;
 
-public class UserConfiguration(EncryptionService encryptionService, IConfiguration configuration) : IEntityTypeConfiguration<User>
+public class UserConfiguration(IEncryptionService encryptionService, IConfiguration configuration) : IEntityTypeConfiguration<User>
 {
     private readonly IEncryptionService _encryptionService = encryptionService;
     private readonly IConfiguration _configuration = configuration;
@@ -58,24 +56,31 @@ public class UserConfiguration(EncryptionService encryptionService, IConfigurati
 
         builder.HasMany(user => user.RefreshTokens)
             .WithOne(refreshToken => refreshToken.User)
-            .HasForeignKey(refreshToken => refreshToken.Id);
+            .HasForeignKey(refreshToken => refreshToken.UserId);
+
+        builder.Property(user => user.Role).HasConversion<string>();
+
 
         // Data Seeding
-        builder.HasData(
-            // Todo: Update this after adding the permisions to the User
-            new User
-            {
-                Id = Ulid.Parse("00000000-0000-0000-0000-000000000000"),
-                FirstName = "System",
-                LastName = "Administrator",
-                Email = "systemadmin@hms.com",
-                PasswordHash = _encryptionService.HashPassword(_configuration.GetRequiredSetting("SystemAdminPassword")),
-                Username = "systemadmin",
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Ulid.Parse("00000000-0000-0000-0000-000000000000"),
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = Ulid.Parse("00000000-0000-0000-0000-000000000000")
-            }
-        );
+        ///<summary>
+        ///You can add your Admin User here.
+        ///</summary>
+        // builder.HasData(
+        //     // Todo: Update this after adding the role to the User
+        //     new User
+        //     {
+        //         Id = Ulid.Parse("00000000-0000-0000-0000-000000000000"),
+        //         FirstName = "System",
+        //         LastName = "Administrator",
+        //         Email = "systemadmin@template.com",
+        //         PasswordHash = _encryptionService.HashPassword(_configuration.GetRequiredSetting("SystemAdminPassword")),
+        //         Username = "systemadmin",
+        //         CreatedAt = DateTime.UtcNow,
+        //         CreatedBy = Ulid.Parse("00000000-0000-0000-0000-000000000000"),
+        //         UpdatedAt = DateTime.UtcNow,
+        //         UpdatedBy = Ulid.Parse("00000000-0000-0000-0000-000000000000"),
+        //          role = RolesEnum.Admin
+        //     }
+        // );
     }
 }

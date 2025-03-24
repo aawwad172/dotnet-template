@@ -1,5 +1,3 @@
-using System;
-
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dotnet.Template.Infrastructure.Convertors;

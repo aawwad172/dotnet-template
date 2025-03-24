@@ -1,12 +1,9 @@
 using System.Security.Authentication;
 
 using Dotnet.Template.Application.Interfaces.Services;
-using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Domain.Interfaces.IRepositories;
-
-using Microsoft.Extensions.Configuration;
 
 namespace Dotnet.Template.Application.HelperServices;
 
@@ -24,7 +21,7 @@ public sealed class AuthenticationService(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
 
-    public async Task<(string AccessToken, string RefreshToken)> AuthenticateUserAsync(string email, string password)
+    public async Task<(string AccessToken, string RefreshToken)> LoginAsync(string email, string password)
     {
         await _unitOfWork.BeginTransactionAsync();
         try
@@ -33,12 +30,19 @@ public sealed class AuthenticationService(
             if (user is null)
                 throw new NotFoundException("User not found");
 
-            if (!_encryptionService.VerifyPassword(password, user.PasswordHash))
+            if (!_encryptionService.VerifyPassword(
+                        password: password,
+                        passwordHash: user.PasswordHash
+                    )
+                )
                 throw new UnauthenticatedException("Invalid password");
 
             string accessToken = _jwtService.GenerateAccessToken(user);
 
             RefreshToken refreshToken = _jwtService.GenerateRefreshToken(user);
+
+            // Updating the User in the DB with the new Refresh Token
+            await _userRepository.UpdateAsync(user);
 
             _ = await _refreshTokenRepository.AddAsync(refreshToken);
 
@@ -85,7 +89,7 @@ public sealed class AuthenticationService(
 
         RefreshToken? token = await _refreshTokenRepository.GetByTokenAsync(hashedToken);
 
-        if (token is null || !token.IsActive)
+        if (token is null || !token.IsActive || token.Token != refreshToken)
             throw new UnauthenticatedException("Invalid or expired refresh token.");
 
 

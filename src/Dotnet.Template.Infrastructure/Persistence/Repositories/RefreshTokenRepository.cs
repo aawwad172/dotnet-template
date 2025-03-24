@@ -1,5 +1,4 @@
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Domain.Interfaces.IRepositories;
 
 using Microsoft.EntityFrameworkCore;
