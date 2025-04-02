@@ -9,14 +9,13 @@ namespace Dotnet.Template.Presentation.API.Middlewares;
 /// </summary>
 /// <remarks>
 /// Make sure to update the configuration settings for "Jwt:JwtSecretKey", "Jwt:JwtIssuer", and "Jwt:JwtAudience" as needed.
+/// Visit https://jwtsecret.com/generate for generating a secure JWT secret key.
 /// </remarks>
 public class JwtMiddleware(
     RequestDelegate next,
-    IJwtService jwtService,
     ILogger<JwtMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
-    private readonly IJwtService _jwtService = jwtService;
     private readonly ILogger<JwtMiddleware> _logger = logger;
 
     /// <summary>
@@ -26,6 +25,8 @@ public class JwtMiddleware(
     /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
     public async Task Invoke(HttpContext context)
     {
+        var _jwtService = context.RequestServices.GetRequiredService<IJwtService>();
+
         string? token = context.Request.Headers["Authorization"]
             .FirstOrDefault()?.Split(" ").Last();
 
@@ -39,7 +40,6 @@ public class JwtMiddleware(
             }
             catch (Exception ex)
             {
-                // Log the error but don't throw to allow the request to continue
                 _logger.LogError(ex, "Failed to validate JWT token");
             }
         }

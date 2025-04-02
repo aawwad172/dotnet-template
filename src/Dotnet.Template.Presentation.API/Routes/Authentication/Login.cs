@@ -3,23 +3,24 @@ using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Presentation.API.Models;
 
 using FluentValidation;
+using FluentValidation.Results;
 
 using MediatR;
 
-namespace Dotnet.Template.Presentation.API.Routes.Account;
+namespace Dotnet.Template.Presentation.API.Routes.Authentication;
 
-public class RegisterUser
+public class Login
 {
     public static async Task<IResult> RegisterRoute(
-           RegisterUserCommand command,
-           IMediator mediator,
-           IValidator<RegisterUserCommand> validator)
+               LoginCommand command,
+               IMediator mediator,
+               IValidator<LoginCommand> validator)
     {
-        var validationResult = await validator.ValidateAsync(command);
+        ValidationResult validationResult = await validator.ValidateAsync(command);
 
         if (!validationResult.IsValid)
         {
-            var errors = validationResult.Errors
+            List<string> errors = validationResult.Errors
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
@@ -27,9 +28,8 @@ public class RegisterUser
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        RegisterUserResult response = await mediator.Send(command);
-        return Results.Created(
-            $"/users/{response.user.Id}",
-            ApiResponse<RegisterUserResult>.SuccessResponse(response));
+        LoginResult response = await mediator.Send(command);
+        return Results.Ok(
+            ApiResponse<LoginResult>.SuccessResponse(response));
     }
 }

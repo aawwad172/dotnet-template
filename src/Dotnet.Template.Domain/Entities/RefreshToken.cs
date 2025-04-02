@@ -10,7 +10,7 @@ public class RefreshToken : IEntity, ICreationAudit
     public required DateTime Expires { get; set; }
     private bool IsExpired => DateTime.UtcNow >= Expires;
     public DateTime? Revoked { get; set; }
-    public string? ReplacedByToken { get; set; }
+    public Guid? ReplacedByToken { get; set; }
     public bool IsActive => Revoked == null && !IsExpired;
     public required DateTime CreatedAt { get; set; }
     public required Guid CreatedBy { get; set; }

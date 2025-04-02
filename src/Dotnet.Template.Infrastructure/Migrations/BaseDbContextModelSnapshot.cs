@@ -38,9 +38,8 @@ namespace Dotnet.Template.Infrastructure.Migrations
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ReplacedByToken")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("ReplacedByToken")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("Revoked")
                         .HasColumnType("timestamp with time zone");

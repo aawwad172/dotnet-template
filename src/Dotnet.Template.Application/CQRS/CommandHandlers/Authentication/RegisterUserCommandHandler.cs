@@ -1,6 +1,7 @@
 
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Application.Interfaces.Services;
+using Dotnet.Template.Domain.Entities;
 
 using MediatR;
 
@@ -12,7 +13,7 @@ public class RegisterUserCommandHandler(IAuthenticationService authService) : IR
 
     public async Task<RegisterUserResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await _authService.RegisterUserAsync(
+        User user = await _authService.RegisterUserAsync(
             firstName: request.FirstName,
             lastName: request.LastName,
             email: request.Email,

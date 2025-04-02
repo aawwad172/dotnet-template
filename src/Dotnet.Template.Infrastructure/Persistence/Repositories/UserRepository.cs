@@ -16,4 +16,14 @@ public sealed class UserRepository(BaseDbContext dbContext) : Repository<User>(d
 
         return null;
     }
+
+    public async Task<User?> GetUserByUsernameAsync(string username)
+    {
+        User? user = await _dbSet.FirstOrDefaultAsync(user => user.Username == username);
+
+        if (user is not null)
+            return user;
+
+        return null;
+    }
 }

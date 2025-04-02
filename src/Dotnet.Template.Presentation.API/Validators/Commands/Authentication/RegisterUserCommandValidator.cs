@@ -2,7 +2,7 @@ using Dotnet.Template.Application.CQRS.Commands.Authentication;
 
 using FluentValidation;
 
-namespace Dotnet.Template.Presentation.API.Validators.Commands.Account;
+namespace Dotnet.Template.Presentation.API.Validators.Commands.Authentication;
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
@@ -28,7 +28,6 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .WithMessage("Username must be in lowercase.");
 
         RuleFor(x => x.Password)
-            .NotEmpty()
             .NotEmpty()
             .MinimumLength(8)
             .WithMessage("Password must be at least 8 characters long.")

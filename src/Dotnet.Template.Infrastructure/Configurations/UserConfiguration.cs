@@ -1,11 +1,8 @@
-using Dotnet.Template.Application.Interfaces.Services;
 using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Domain.Enums;
-using Dotnet.Template.Infrastructure.Convertors;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Extensions.Configuration;
 
 namespace Dotnet.Template.Infrastructure.Configurations;
 

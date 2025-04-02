@@ -1,5 +1,4 @@
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Infrastructure.Convertors;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -22,7 +21,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
             .IsRequired();
 
         builder.Property(refreshToken => refreshToken.ReplacedByToken)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(refreshToken => refreshToken.CreatedAt)
             .IsRequired();

@@ -12,11 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Dotnet.Template.Application.HelperServices;
 
-public class JwtService(IConfiguration configuration, IEncryptionService encryptionService) : IJwtService
+public class JwtService(IConfiguration configuration) : IJwtService
 {
     private readonly IConfiguration _configuration = configuration;
-    private readonly IEncryptionService _encryptionService = encryptionService;
-
     public string GenerateAccessToken(User user)
     {
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:JwtSecretKey")));
@@ -48,14 +46,13 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
     {
         RefreshToken refreshToken = new RefreshToken
         {
+            Id = Guid.CreateVersion7(),
             Token = GenerateRefreshToken(),
             UserId = user.Id,
             Expires = DateTime.UtcNow.AddDays(int.Parse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"))),
             CreatedAt = DateTime.UtcNow,
             CreatedBy = user.Id
         };
-
-        user.RefreshTokens.Add(refreshToken);
 
         return refreshToken;
     }
@@ -88,7 +85,7 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
         {
             rng.GetBytes(randomBytes);
         }
-        return _encryptionService.Hash(Convert.ToBase64String(randomBytes));
+        return Convert.ToBase64String(randomBytes);
     }
     #endregion
 }

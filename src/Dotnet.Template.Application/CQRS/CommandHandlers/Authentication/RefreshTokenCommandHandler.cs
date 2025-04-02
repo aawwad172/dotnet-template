@@ -10,8 +10,10 @@ public class RefreshTokenCommandHandler(IAuthenticationService authService) : IR
 {
     private readonly IAuthenticationService _authService = authService;
 
-    public Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        (string accessToken, string refreshToken) = await _authService.RefreshAccessTokenAsync(request.RefreshToken);
+
+        return new RefreshTokenResult(accessToken, refreshToken);
     }
 }

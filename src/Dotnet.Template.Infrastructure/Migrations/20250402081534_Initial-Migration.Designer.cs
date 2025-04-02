@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dotnet.Template.Infrastructure.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20250402034629_Initial-Migration")]
+    [Migration("20250402081534_Initial-Migration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -41,9 +41,8 @@ namespace Dotnet.Template.Infrastructure.Migrations
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ReplacedByToken")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("ReplacedByToken")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("Revoked")
                         .HasColumnType("timestamp with time zone");

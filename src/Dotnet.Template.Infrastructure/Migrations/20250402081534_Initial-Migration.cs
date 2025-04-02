@@ -43,7 +43,7 @@ namespace Dotnet.Template.Infrastructure.Migrations
                     Token = table.Column<string>(type: "text", nullable: false),
                     Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Revoked = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReplacedByToken = table.Column<string>(type: "text", nullable: false),
+                    ReplacedByToken = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
