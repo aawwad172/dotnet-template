@@ -84,8 +84,6 @@ app.MapPost("/users/logout", Logout.RegisterRoute).WithTags("Authentication").Re
 
 #endregion
 
-app.MapGet("/auth", () => "Hello World!").RequireAuthorization("UserPolicy");
-
 app.Run();
 
 /// <summary>

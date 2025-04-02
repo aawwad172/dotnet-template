@@ -24,7 +24,7 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
 
 - **JWT Middleware and Service:**  
   Provides a built-in JWT middleware and a dedicated JWT service for handling authentication and authorization.  
-  **Important:** Make sure to change the variables in your `appsettings.json` (connection string, JWT secret, issuer, and audience) to match your own configuration.
+  **Important:** Make sure to change the variables in your `appsettings.json` (connection string, JWT secret, issuer, audience, and **EncryptionKey**) to match your own configuration.
 
 - **Postgres Integration:**  
   The template is built on PostgreSQL. Connection strings and related configurations are set up accordingly.
@@ -37,11 +37,15 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
   **Note:** Install Husky via `npx` (e.g., `npx husky-init && npm install`) to activate pre-commit hooks for your .NET projects.
 
 - **Makefile for .NET CLI Tasks:**  
-  A Makefile is included for managing migrations (using EF Core), updating the database, running, and building the application. This centralizes all .NET CLI commands.
+  A Makefile is included for managing migrations (using EF Core), updating the database, running, and building the application.  
+  **Note:** The command to update the database has been renamed from `update-database` to `database-update` in the Makefile.
 
 - **Exception Handling Middleware:**  
   A global exception handling middleware is provided. Simply throw your exceptions and let the middleware handle them.  
   In addition, you can use the `ApiResponse` class for consistent and clean API responses.
+
+- **Fluent Validation:**  
+  This template uses Fluent Validation to handle exceptions and validation in a clean, separated manner. This ensures that your validation logic is decoupled from your controllers and business logic.
 
 - **Query Extension for Pagination:**  
   The template includes a query extension that simplifies pagination in your queries.
@@ -79,12 +83,22 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
          "Audience": "yourdomain.com"
        }
        ```
+       You can generate a JWT key from this [Website](https://jwtsecret.com/generate)
+       
+     - **Security Settings:**  
+       **Important:** Change the `EncryptionKey` to your own secure key.
+       ```json
+       "Security": {
+         "EncryptionKey": "YourUniqueEncryptionKeyHere",
+         "SystemAdminPassword": "YourSystemAdminPasswordHere"
+       }
+       ```
 
 4. **Run the Application:**
 
    Use the Makefile to run migrations, update the database, or run the application. For example, to update the database:
    ```bash
-   make update-database
+   make database-update
    ```
    And to run the application:
    ```bash
@@ -113,10 +127,18 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
 - **Query Extension for Pagination:**  
   A query extension is available to simplify pagination. Use it in your query handlers to easily implement paging functionality.
 
+## Contributions & Feedback
+
+Contributions, suggestions, and feedback are welcome!  
+If you have any ideas or improvements that could help enhance this template, don't hesitate to contribute or open an issue.
 
 ## Conclusion
 
 This template is designed to jumpstart your .NET application development using best practices like DDD, Clean Architecture, DI, UnitOfWork, CQRS, and more. Customize the configuration files, update the connection strings and JWT settings, and extend the provided features to suit your application's needs.
 
 Happy coding!
+
 By Ahmad Awwad :)
+```
+
+Feel free to adjust any sections as needed. This updated README now clearly instructs users to update the `EncryptionKey`, reflects the new Makefile command, and invites contributions, while also highlighting the use of Fluent Validation and clean separation of concerns in exception handling.
