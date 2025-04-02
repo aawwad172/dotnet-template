@@ -2,13 +2,13 @@ namespace Dotnet.Template.Domain.Interfaces.IRepositories;
 
 public interface IUnitOfWork : IDisposable
 {
-    Task BeginTransactionAsync(CancellationToken cancellationToken);
+    Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
-    Task<int> SaveAsync(CancellationToken cancellationToken);
+    Task<int> SaveAsync(CancellationToken cancellationToken = default);
 
-    Task CommitAsync(CancellationToken cancellationToken);
+    Task CommitAsync(CancellationToken cancellationToken = default);
 
-    Task RollbackAsync(CancellationToken cancellationToken);
+    Task RollbackAsync(CancellationToken cancellationToken = default);
 
     void Detach<TEntity>(TEntity entity) where TEntity : class;
 }

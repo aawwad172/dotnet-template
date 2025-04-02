@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-    <PackageReference Include="Ulid" Version="1.3.4" />
   </ItemGroup>
 
 </Project>
