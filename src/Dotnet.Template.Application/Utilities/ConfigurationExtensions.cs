@@ -9,7 +9,7 @@ public static class ConfigurationExtensions
     /// <summary>
     /// Retrieves a required configuration value.
     /// It first checks the configuration (e.g., appsettings.json) and then falls back to environment variables.
-    /// Throws an InvalidOperationException if the key is not found in either.
+    /// Throws an EnvironmentVariableNotSetException if the key is not found in either.
     /// </summary>
     /// <param name="configuration">The IConfiguration instance.</param>
     /// <param name="key">The key of the configuration value.</param>

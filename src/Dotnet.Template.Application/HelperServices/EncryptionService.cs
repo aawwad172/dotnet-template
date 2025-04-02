@@ -10,7 +10,7 @@ namespace Dotnet.Template.Application.HelperServices;
 
 public class EncryptionService(IConfiguration configuration) : IEncryptionService
 {
-    private readonly byte[] _encryptionKey = Encoding.UTF8.GetBytes(configuration.GetRequiredSetting("EncryptionKey"));
+    private readonly byte[] _encryptionKey = Encoding.UTF8.GetBytes(configuration.GetRequiredSetting("Security:EncryptionKey"));
     private const int SaltSize = 16;
     private const int HashSize = 32;
     private const int Iterations = 100000;

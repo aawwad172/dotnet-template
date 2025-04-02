@@ -1,4 +1,6 @@
-﻿using Dotnet.Template.Application.Utilities;
+﻿using Dotnet.Template.Application.HelperServices;
+using Dotnet.Template.Application.Interfaces.Services;
+using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Interfaces.IRepositories;
 using Dotnet.Template.Infrastructure.Persistence;
 using Dotnet.Template.Infrastructure.Persistence.Repositories;
@@ -20,6 +22,8 @@ public static class DependencyInjection
         // services.AddScoped<IRepository, Repository>();
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddLogging();
 

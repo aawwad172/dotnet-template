@@ -42,6 +42,20 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
             _logger.LogWarning("UnauthorizedException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "UNAUTHORIZED", ex.Message, StatusCodes.Status403Forbidden);
         }
+        catch (ConflictException ex)
+        {
+            _logger.LogWarning("ConflictException occurred: {Message}", ex.Message);
+            await HandleExceptionAsync(context, "CONFLICT", ex.Message, StatusCodes.Status409Conflict);
+        }
+        catch (CustomValidationException ex)
+        {
+            _logger.LogWarning("CustomValidationException occurred: {Message}", ex.Message);
+            await HandleExceptionAsync(
+                context,
+                "VALIDATION_ERROR",
+                JoinErrors(ex.Errors),
+                StatusCodes.Status400BadRequest);
+        }
         catch (Exception ex)
         {
             _logger.LogError("An unexpected error occurred: {Message}", ex.Message);
@@ -57,5 +71,10 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
         ApiResponse<string> response = ApiResponse<string>.ErrorResponse(message, errorCode, statusCode);
         string result = JsonSerializer.Serialize(response);
         await context.Response.WriteAsync(result);
+    }
+
+    private string JoinErrors(IEnumerable<string> errors)
+    {
+        return string.Join(", ", errors);
     }
 }

@@ -2,6 +2,7 @@ using System.Security.Authentication;
 
 using Dotnet.Template.Application.Interfaces.Services;
 using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Domain.Enums;
 using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Domain.Interfaces.IRepositories;
 
@@ -118,6 +119,51 @@ public sealed class AuthenticationService(
 
             // Return the new tokens to the client
             return (newAccessToken, newRefreshToken.Token);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<User> RegisterUserAsync(
+        string firstName,
+        string lastName,
+        string email,
+        string username,
+        string password)
+    {
+        // Check if a user already exists with the same email.
+        var existingUser = await _userRepository.GetUserByEmailAsync(email);
+        if (existingUser is not null)
+            throw new ConflictException("A user with this email already exists.");
+
+        Guid id = Guid.CreateVersion7();
+
+        var user = new User
+        {
+            Id = id,
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Username = username,
+            PasswordHash = _encryptionService.HashPassword(password),
+            Role = RolesEnum.User,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            CreatedBy = Guid.Empty,
+            UpdatedBy = Guid.Empty,
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            _ = _userRepository.AddAsync(user);
+            await _unitOfWork.SaveAsync();
+            await _unitOfWork.CommitAsync();
+
+            return user;
         }
         catch (Exception)
         {

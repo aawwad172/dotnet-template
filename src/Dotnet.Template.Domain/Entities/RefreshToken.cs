@@ -5,7 +5,7 @@ namespace Dotnet.Template.Domain.Entities;
 
 public class RefreshToken : IEntity, ICreationAudit
 {
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
     public required string Token { get; set; }
     public required DateTime Expires { get; set; }
     private bool IsExpired => DateTime.UtcNow >= Expires;
@@ -13,9 +13,9 @@ public class RefreshToken : IEntity, ICreationAudit
     public string? ReplacedByToken { get; set; }
     public bool IsActive => Revoked == null && !IsExpired;
     public required DateTime CreatedAt { get; set; }
-    public required Ulid CreatedBy { get; set; }
+    public required Guid CreatedBy { get; set; }
 
     // Navigation property back to User
     public User User { get; set; } = null!;
-    public required Ulid UserId { get; set; }
+    public required Guid UserId { get; set; }
 }

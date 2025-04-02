@@ -12,7 +12,8 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
     {
         builder.HasKey(refreshToken => refreshToken.Id);
 
-        builder.Property(refreshToken => refreshToken.Id).HasConversion(UlidToStringConvertor.Instance);
+        builder.Property(refreshToken => refreshToken.Id)
+            .IsRequired();
 
         builder.Property(refreshToken => refreshToken.Token)
             .IsRequired();
@@ -27,12 +28,10 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
             .IsRequired();
 
         builder.Property(refreshToken => refreshToken.CreatedBy)
-            .IsRequired()
-            .HasConversion(UlidToStringConvertor.Instance);
+            .IsRequired();
 
         builder.Property(refreshToken => refreshToken.UserId)
-            .IsRequired()
-            .HasConversion(UlidToStringConvertor.Instance);
+            .IsRequired();
 
         builder.HasOne(refreshToken => refreshToken.User)
             .WithMany(user => user.RefreshTokens)

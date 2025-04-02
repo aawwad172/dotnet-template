@@ -31,7 +31,7 @@ public class JwtService(IConfiguration configuration, IEncryptionService encrypt
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Ulid.NewUlid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.CreateVersion7().ToString())
             ]),
             Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"))),
             SigningCredentials = creds,

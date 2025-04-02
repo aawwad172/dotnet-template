@@ -33,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         return await query.ToPagedQueryAsync(pageNumber, pageSize);
     }
 
-    public async Task<T?> GetByIdAsync(Ulid id)
+    public async Task<T?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }
@@ -49,7 +49,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
     /// If the entity is not found, nothing happens.
     /// The service layer can decide how to handle a "not found" case.
     /// </summary>
-    public async Task DeleteAsync(Ulid id)
+    public async Task DeleteAsync(Guid id)
     {
         T? entity = await _dbSet.FindAsync(id);
         if (entity is not null)

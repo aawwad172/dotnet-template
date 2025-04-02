@@ -1,9 +1,15 @@
+using System.Reflection;
+
 using Dotnet.Template.Application;
+using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain;
 using Dotnet.Template.Infrastructure;
+using Dotnet.Template.Presentation.API;
 using Dotnet.Template.Presentation.API.Configurations;
 using Dotnet.Template.Presentation.API.Middlewares;
+using Dotnet.Template.Presentation.API.Models;
+using Dotnet.Template.Presentation.API.Routes.Account;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +22,10 @@ builder.Services.AddSwaggerAuth();
 
 builder.Services.AddDomain()
                 .AddApplication()
-                .AddInfrastructure(builder.Configuration);
+                .AddInfrastructure(builder.Configuration)
+                .AddPresentation();
+
+builder.Logging.AddConsole();
 
 WebApplication app = builder.Build();
 
@@ -45,6 +54,17 @@ app.MapGet("/", () => new
         health = "/health"
     }
 }).WithTags("Home");
+
+#region Authentication
+
+app.MapPost("/users", RegisterUser.RegisterRoute).WithTags("Account")
+   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status201Created, "application/json")
+   .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
+   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status409Conflict, "application/json")
+   .Accepts<RegisterUserCommand>("application/json");
+
+#endregion
+
 
 app.Run();
 
