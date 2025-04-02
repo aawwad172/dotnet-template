@@ -5,6 +5,7 @@ using System.Text;
 using Dotnet.Template.Application.Interfaces.Services;
 using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Domain.Exceptions;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -74,7 +75,13 @@ public class JwtService(IConfiguration configuration) : IJwtService
         };
 
         TokenValidationResult result = await tokenHandler.ValidateTokenAsync(token, validationParameters);
-        return result.IsValid ? new ClaimsPrincipal(result.ClaimsIdentity) : null!;
+
+        if (!result.IsValid)
+        {
+            throw new UnauthenticatedException("Invalid token");
+        }
+
+        return new ClaimsPrincipal(result.ClaimsIdentity);
     }
 
     #region Private Helper Methods

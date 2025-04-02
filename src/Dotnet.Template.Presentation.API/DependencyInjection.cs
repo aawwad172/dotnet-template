@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 
+using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Enums;
 using Dotnet.Template.Presentation.API.Validators.Commands.Authentication;
 
@@ -66,9 +67,9 @@ public static class DependencyInjection
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:JwtSecretKey"]!))
+                ValidIssuer = configuration.GetRequiredSetting("Jwt:Issuer"),
+                ValidAudience = configuration.GetRequiredSetting("Jwt:Audience"),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetRequiredSetting("Jwt:JwtSecretKey")))
             };
         });
 

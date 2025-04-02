@@ -4,6 +4,7 @@ using System.Text.Json;
 using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Presentation.API.Models;
 
+
 namespace Dotnet.Template.Presentation.API.Middlewares;
 
 public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
