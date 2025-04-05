@@ -64,6 +64,12 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
      ```bash
      dotnet restore
      ```
+3. **Rename the Project**
+
+   - Use the Renaming Script using `Make`
+     ```make
+     make rename-project name=your_project_name_goes_here
+     ```
 
 3. **Update Configuration:**
 
