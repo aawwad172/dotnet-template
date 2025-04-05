@@ -68,7 +68,7 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
 
    - Use the Renaming Script using `Make`
      ```make
-     make rename-project name=your_project_name_goes_here
+     make rename-project name="<project_name>"
      ```
 
 4. **Update Configuration:**
