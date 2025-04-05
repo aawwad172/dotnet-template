@@ -64,8 +64,14 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
      ```bash
      dotnet restore
      ```
+3. **Rename the Project**
 
-3. **Update Configuration:**
+   - Use the Renaming Script using `Make`
+     ```make
+     make rename-project name="<project_name>"
+     ```
+
+4. **Update Configuration:**
 
    - Open `appsettings.json` and `appsettings.Development.json`.
    - Update the following configuration values:
@@ -94,7 +100,7 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
        }
        ```
 
-4. **Run the Application:**
+5. **Run the Application:**
 
    Use the Makefile to run migrations, update the database, or run the application. For example, to update the database:
    ```bash
