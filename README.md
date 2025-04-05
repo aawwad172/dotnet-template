@@ -71,7 +71,7 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
      make rename-project name=your_project_name_goes_here
      ```
 
-3. **Update Configuration:**
+4. **Update Configuration:**
 
    - Open `appsettings.json` and `appsettings.Development.json`.
    - Update the following configuration values:
@@ -100,7 +100,7 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
        }
        ```
 
-4. **Run the Application:**
+5. **Run the Application:**
 
    Use the Makefile to run migrations, update the database, or run the application. For example, to update the database:
    ```bash
