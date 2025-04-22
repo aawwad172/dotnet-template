@@ -146,4 +146,3 @@ Happy coding!
 
 By Ahmad Awwad :)
 
-Feel free to adjust any sections as needed. This updated README now clearly instructs users to update the `EncryptionKey`, reflects the new Makefile command, and invites contributions, while also highlighting the use of Fluent Validation and clean separation of concerns in exception handling.
