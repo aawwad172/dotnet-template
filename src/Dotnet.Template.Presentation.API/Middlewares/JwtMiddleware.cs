@@ -8,7 +8,7 @@ namespace Dotnet.Template.Presentation.API.Middlewares;
 /// Middleware for validating JWT tokens and attaching user information to the HTTP context.
 /// </summary>
 /// <remarks>
-/// Make sure to update the configuration settings for "Jwt:JwtSecretKey", "Jwt:JwtIssuer", and "Jwt:JwtAudience" as needed.
+/// Make sure to update the configuration settings for "Jwt:JwtSecretKey", "Jwt:Issuer", and "Jwt:Audience" as needed.
 /// Visit https://jwtsecret.com/generate for generating a secure JWT secret key.
 /// </remarks>
 public class JwtMiddleware(
