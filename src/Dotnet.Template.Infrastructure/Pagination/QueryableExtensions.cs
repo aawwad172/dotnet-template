@@ -15,8 +15,8 @@ public static class QueryableExtensions
         if (pageSize is not null)
             query = query.Take((int)pageSize);
 
-        if (pageNumber is not null)
-            query = query.Skip(pageSize ?? 0 * ((int)pageNumber - 1));
+        if (pageNumber is not null && pageSize is not null)
+            query = query.Skip(((int)pageNumber - 1) * (int)pageSize);
 
         List<T> result = await query.ToListAsync();
 
