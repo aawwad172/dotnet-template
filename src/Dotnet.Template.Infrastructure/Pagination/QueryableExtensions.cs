@@ -13,10 +13,14 @@ public static class QueryableExtensions
         int TotalRecords = await query.CountAsync();
 
         if (pageSize is not null)
+        {
             query = query.Take((int)pageSize);
+        }
 
         if (pageNumber is not null)
-            query = query.Skip(pageSize ?? 0 * ((int)pageNumber - 1));
+        {
+            query = query.Skip(((pageSize ?? 0) * ((int)pageNumber - 1)));
+        }
 
         List<T> result = await query.ToListAsync();
 
