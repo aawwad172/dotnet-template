@@ -9,7 +9,7 @@ public static class SwaggerAuthExtension
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Progress Path API",
+                Title = "Dotnet Template API",
                 Version = "v1"
             });
 
