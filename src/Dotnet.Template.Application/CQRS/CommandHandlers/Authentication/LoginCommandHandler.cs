@@ -1,6 +1,6 @@
 
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
-using Dotnet.Template.Application.Interfaces.Services;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 using MediatR;
 
@@ -15,6 +15,8 @@ public class LoginCommandHandler(IAuthenticationService authService) : IRequestH
             email: request.Email,
             password: request.Password
         );
+
+
 
         return new LoginResult(
             AccessToken: accessToken,

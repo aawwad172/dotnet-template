@@ -19,8 +19,8 @@ public class ApiResponse<T>
 
     // Factory methods
     public static ApiResponse<T> SuccessResponse(T data, int statusCode = 200)
-        => new ApiResponse<T>(true, data, statusCode, null, null);
+        => new(true, data, statusCode, null, null);
 
     public static ApiResponse<T> ErrorResponse(string errorMessage, string errorCode, int statusCode)
-        => new ApiResponse<T>(false, default, statusCode, errorMessage, errorCode);
+        => new(false, default, statusCode, errorMessage, errorCode);
 }

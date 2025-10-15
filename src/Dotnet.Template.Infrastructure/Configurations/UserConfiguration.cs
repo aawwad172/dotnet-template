@@ -1,5 +1,5 @@
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Enums;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -8,80 +8,67 @@ namespace Dotnet.Template.Infrastructure.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public UserConfiguration()
-    {
-    }
-
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(user => user.Id);
+        builder.ToTable("Users");
 
-        builder.Property(user => user.Id)
-            .IsRequired();
+        // Key
+        builder.HasKey(u => u.Id);
 
-        builder.Property(user => user.FirstName)
-            .HasMaxLength(50)
-            .IsRequired();
+        // Required basics
+        builder.Property(u => u.FirstName)
+            .IsRequired()
+            .HasMaxLength(50);
 
-        builder.Property(user => user.LastName)
-            .HasMaxLength(50)
-            .IsRequired();
+        builder.Property(u => u.LastName)
+            .IsRequired()
+            .HasMaxLength(50);
 
-        builder.HasIndex(user => user.Email)
-            .IsUnique();
+        // Email & Username (unique)
+        builder.Property(u => u.Email)
+            .IsRequired()
+            .HasMaxLength(256);
 
-        builder.Property(user => user.Email)
-            .IsRequired();
+        builder.HasIndex(u => u.Email).IsUnique();
 
-        builder.Property(user => user.PasswordHash)
-            .IsRequired();
+        builder.Property(u => u.Username)
+            .IsRequired()
+            .HasMaxLength(50);
 
-        builder.Property(user => user.Username)
-            .IsRequired();
+        builder.HasIndex(u => u.Username).IsUnique();
 
-        builder.Property(user => user.CreatedAt)
-            .IsRequired();
+        // AuthN fields
+        builder.Property(u => u.PasswordHash)
+            .IsRequired()
+            .HasMaxLength(256);
 
-        builder.Property(user => user.CreatedBy)
-            .IsRequired();
+        builder.Property(u => u.IsActive)
+            .HasDefaultValue(true);
 
-        builder.Property(user => user.UpdatedAt)
-            .IsRequired();
+        builder.Property(u => u.SecurityStamp)
+            .HasMaxLength(128);
 
-        builder.Property(user => user.UpdatedBy)
-            .IsRequired();
+        // Auditing
+        builder.Property(u => u.CreatedAt).IsRequired();
+        builder.Property(u => u.CreatedBy).IsRequired();
+        builder.Property(u => u.UpdatedAt).IsRequired();
+        builder.Property(u => u.UpdatedBy).IsRequired();
 
-        builder.HasMany(user => user.RefreshTokens)
-            .WithOne(refreshToken => refreshToken.User)
-            .HasForeignKey(refreshToken => refreshToken.UserId);
+        // Relationships
+        builder.HasMany(u => u.RefreshTokens)
+            .WithOne(rt => rt.User)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(user => user.Role)
-        .HasConversion(
-            v => v.ToString(),
-            v => (RolesEnum)Enum.Parse(typeof(RolesEnum), v)
-        );
+        // NEW: RBAC relationships (assuming you added these navs on User)
+        builder.HasMany(u => u.UserRoles)
+            .WithOne(ur => ur.User)
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-
-        // Data Seeding
-        ///<summary>
-        ///You can add your Admin User here.
-        ///</summary>
-        // builder.HasData(
-        //     // Todo: Update this after adding the role to the User
-        //     new User
-        //     {
-        //         Id = Guid.Parse("00000000-0000-0000-0000-000000000000"),
-        //         FirstName = "System",
-        //         LastName = "Administrator",
-        //         Email = "systemadmin@template.com",
-        //         PasswordHash = _encryptionService.HashPassword(_configuration.GetRequiredSetting("SystemAdminPassword")),
-        //         Username = "systemadmin",
-        //         CreatedAt = DateTime.UtcNow,
-        //         CreatedBy = Guid.Parse("00000000-0000-0000-0000-000000000000"),
-        //         UpdatedAt = DateTime.UtcNow,
-        //         UpdatedBy = Guid.Parse("00000000-0000-0000-0000-000000000000"),
-        //          role = RolesEnum.Admin
-        //     }
-        // );
+        builder.HasMany(u => u.PermissionOverrides)
+            .WithOne(po => po.User)
+            .HasForeignKey(po => po.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

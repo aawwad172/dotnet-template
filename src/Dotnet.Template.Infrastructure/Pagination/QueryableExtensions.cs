@@ -10,7 +10,7 @@ public static class QueryableExtensions
     // The default behavior of this method is to return everything from the query.
     public static async Task<PaginationResult<T>> ToPagedQueryAsync<T>(this IQueryable<T> query, int? pageNumber, int? pageSize)
     {
-        int TotalRecords = await query.CountAsync();
+        int totalRecords = await query.CountAsync();
 
         if (pageSize is not null)
             query = query.Take((int)pageSize);
@@ -23,7 +23,7 @@ public static class QueryableExtensions
         return new PaginationResult<T>
         {
             Page = result,
-            TotalRecords = TotalRecords,
+            TotalRecords = totalRecords,
             TotalDisplayRecords = result.Count
         };
     }

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 
-using Dotnet.Template.Application.Interfaces.Services;
+using Dotnet.Template.Application.Services;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 namespace Dotnet.Template.Presentation.API.Middlewares;
 
@@ -23,9 +24,9 @@ public class JwtMiddleware(
     /// </summary>
     /// <param name="context">The current HTTP context.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-    public async Task Invoke(HttpContext context)
+    public async Task Invoke(HttpContext context, ICurrentUserService currentUser)
     {
-        var _jwtService = context.RequestServices.GetRequiredService<IJwtService>();
+        IJwtService _jwtService = context.RequestServices.GetRequiredService<IJwtService>();
 
         string? token = context.Request.Headers["Authorization"]
             .FirstOrDefault()?.Split(" ").Last();
@@ -34,13 +35,39 @@ public class JwtMiddleware(
         {
             try
             {
-                Task<ClaimsPrincipal>? result = _jwtService.ValidateToken(token);
-                if (result is not null)
-                    context.User = await result;
+                ClaimsPrincipal? principal = await _jwtService.ValidateToken(token);
+                if (principal is not null)
+                {
+                    context.User = principal;
+
+                    // set the current user service properties (safe because CurrentUserService is scoped)
+                    // try common claim types: NameIdentifier (ClaimTypes.NameIdentifier), "sub", "id"
+                    var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                                 ?? principal.FindFirst("sub")?.Value
+                                 ?? principal.FindFirst("id")?.Value;
+
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        currentUser.UserId = Guid.Parse(userId);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to validate JWT token");
+            }
+        }
+        else
+        {
+            // Optionally: if another authentication middleware populated context.User
+            // populate currentUser from context.User (useful if you call UseAuthentication earlier)
+            if (context.User?.Identity?.IsAuthenticated == true)
+            {
+                var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                             ?? context.User.FindFirst("sub")?.Value
+                             ?? context.User.FindFirst("id")?.Value;
+                if (!string.IsNullOrEmpty(userId) && currentUser is CurrentUserService impl)
+                    impl.UserId = Guid.Parse(userId);
             }
         }
 

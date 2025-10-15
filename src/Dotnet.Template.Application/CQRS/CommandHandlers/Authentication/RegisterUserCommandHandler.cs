@@ -1,7 +1,8 @@
 
+
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
-using Dotnet.Template.Application.Interfaces.Services;
 using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 using MediatR;
 

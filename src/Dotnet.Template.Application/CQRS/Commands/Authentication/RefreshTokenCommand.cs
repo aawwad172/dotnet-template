@@ -2,6 +2,6 @@ using MediatR;
 
 namespace Dotnet.Template.Application.CQRS.Commands.Authentication;
 
-public record RefreshTokenCommand(string RefreshToken) : IRequest<RefreshTokenResult>;
+public record RefreshTokenCommand(string RefreshToken) : IRequest<RefreshTokenCommandResult>;
 
-public record RefreshTokenResult(string AccessToken, string RefreshToken);
+public record RefreshTokenCommandResult(string AccessToken, string RefreshToken);

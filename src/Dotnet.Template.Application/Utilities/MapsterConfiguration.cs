@@ -1,5 +1,3 @@
-using Mapster;
-
 namespace Dotnet.Template.Application.Utilities;
 
 public static class MapsterConfiguration

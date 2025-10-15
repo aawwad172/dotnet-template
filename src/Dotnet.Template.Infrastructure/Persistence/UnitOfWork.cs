@@ -1,4 +1,4 @@
-using Dotnet.Template.Domain.Interfaces.IRepositories;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

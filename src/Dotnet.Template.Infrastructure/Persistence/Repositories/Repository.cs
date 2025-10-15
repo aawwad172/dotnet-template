@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Interfaces;
-using Dotnet.Template.Domain.Interfaces.IRepositories;
+using Dotnet.Template.Domain.Interfaces.Domain;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 using Dotnet.Template.Infrastructure.Pagination;
 
 using Microsoft.EntityFrameworkCore;

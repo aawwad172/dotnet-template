@@ -28,8 +28,8 @@ public class Logout
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        var response = await mediator.Send(command);
+        LogoutCommandResult response = await mediator.Send(command);
 
-        return Results.Ok(ApiResponse<LogoutResult>.SuccessResponse(response));
+        return Results.Ok(ApiResponse<LogoutCommandResult>.SuccessResponse(response));
     }
 }

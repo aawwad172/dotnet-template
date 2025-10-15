@@ -28,8 +28,8 @@ public class RefreshToken
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        RefreshTokenResult? response = await mediator.Send(command);
+        RefreshTokenCommandResult? response = await mediator.Send(command);
         return Results.Ok(
-            ApiResponse<RefreshTokenResult>.SuccessResponse(response));
+            ApiResponse<RefreshTokenCommandResult>.SuccessResponse(response));
     }
 }

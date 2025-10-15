@@ -1,5 +1,6 @@
+
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Interfaces.IRepositories;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -11,19 +12,13 @@ public sealed class UserRepository(BaseDbContext dbContext) : Repository<User>(d
     {
         User? user = await _dbSet.FirstOrDefaultAsync(user => user.Email == email);
 
-        if (user is not null)
-            return user;
-
-        return null;
+        return user is not null ? user : null;
     }
 
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
         User? user = await _dbSet.FirstOrDefaultAsync(user => user.Username == username);
 
-        if (user is not null)
-            return user;
-
-        return null;
+        return user is not null ? user : null;
     }
 }

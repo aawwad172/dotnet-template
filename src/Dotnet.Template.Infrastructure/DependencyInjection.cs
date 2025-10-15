@@ -1,7 +1,7 @@
-﻿using Dotnet.Template.Application.HelperServices;
-using Dotnet.Template.Application.Interfaces.Services;
+﻿using Dotnet.Template.Application.Services;
 using Dotnet.Template.Application.Utilities;
-using Dotnet.Template.Domain.Interfaces.IRepositories;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 using Dotnet.Template.Infrastructure.Persistence;
 using Dotnet.Template.Infrastructure.Persistence.Repositories;
 
@@ -25,6 +25,9 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddLogging();
 
         return services;

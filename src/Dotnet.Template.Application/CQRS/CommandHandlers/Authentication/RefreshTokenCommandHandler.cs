@@ -1,19 +1,20 @@
 
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
-using Dotnet.Template.Application.Interfaces.Services;
-
-using MediatR;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 namespace Dotnet.Template.Application.CQRS.CommandHandlers.Authentication;
 
-public class RefreshTokenCommandHandler(IAuthenticationService authService) : IRequestHandler<RefreshTokenCommand, RefreshTokenResult>
+public class RefreshTokenCommandHandler(
+    IAuthenticationService authService,
+    ICurrentUserService currentUserService)
+    : BaseHandler<RefreshTokenCommand, RefreshTokenCommandResult>(currentUserService)
 {
     private readonly IAuthenticationService _authService = authService;
 
-    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async override Task<RefreshTokenCommandResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        (string accessToken, string refreshToken) = await _authService.RefreshAccessTokenAsync(request.RefreshToken);
+        (string accessToken, string refreshToken) = await _authService.RefreshAccessTokenAsync(request.RefreshToken, _currentUser.UserId);
 
-        return new RefreshTokenResult(accessToken, refreshToken);
+        return new RefreshTokenCommandResult(accessToken, refreshToken);
     }
 }
