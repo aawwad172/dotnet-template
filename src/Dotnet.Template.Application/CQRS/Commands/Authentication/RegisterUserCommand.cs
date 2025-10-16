@@ -9,6 +9,6 @@ public record RegisterUserCommand(
     string LastName,
     string Email,
     string Username,
-    string Password) : IRequest<RegisterUserResult>;
+    string Password) : IRequest<RegisterUserCommandResult>;
 
-public record RegisterUserResult(User user, string message);
+public record RegisterUserCommandResult(User user, string message);

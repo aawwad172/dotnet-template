@@ -1,4 +1,3 @@
-using Dotnet.Template.Domain.Interfaces.Domain;
 using Dotnet.Template.Domain.Interfaces.Domain.Auditing;
 
 namespace Dotnet.Template.Domain.Entities.Authentication;

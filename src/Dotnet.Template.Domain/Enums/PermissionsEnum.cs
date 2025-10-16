@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 namespace Dotnet.Template.Domain.Enums;
 
 public static class PermissionsEnum

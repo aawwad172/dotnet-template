@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Dotnet.Template.Infrastructure.Migrations
 {
-    [DbContext(typeof(BaseDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class BaseDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

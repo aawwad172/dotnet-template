@@ -1,6 +1,6 @@
 namespace Dotnet.Template.Domain.Interfaces.Domain.Auditing;
 
-public interface ISoftDeletable
+public interface ISoftDelete
 {
     public bool IsDeleted { get; set; }
 }

@@ -19,7 +19,6 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(typeof(LogoutCommandHandler).Assembly);
         });
         services.AddScoped<ISecurityService, SecurityService>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IMapper, Mapper>();

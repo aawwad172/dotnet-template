@@ -1,26 +1,75 @@
 
-using Dotnet.Template.Application.CQRS.Commands.Authentication;
-using Dotnet.Template.Domain.Interfaces.Application.Services;
+using System.Security.Authentication;
 
-using MediatR;
+using Dotnet.Template.Application.CQRS.Commands.Authentication;
+using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Domain.Entities.Authentication;
+using Dotnet.Template.Domain.Exceptions;
+using Dotnet.Template.Domain.Interfaces.Application.Services;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
+
+using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Application.CQRS.CommandHandlers.Authentication;
 
-public class LoginCommandHandler(IAuthenticationService authService) : IRequestHandler<LoginCommand, LoginResult>
+public class LoginCommandHandler(
+    ICurrentUserService currentUserService,
+    ILogger<LoginCommandHandler> logger,
+    IUnitOfWork unitOfWork,
+    IUserRepository userRepository,
+    ISecurityService securityService,
+    IRefreshTokenRepository refreshTokenRepository,
+    IJwtService jwtService) : BaseHandler<LoginCommand, LoginCommandResult>(currentUserService, logger, unitOfWork)
 {
-    private readonly IAuthenticationService _authService = authService;
-    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly ISecurityService _securityService = securityService;
+    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
+    private readonly IJwtService _jwtService = jwtService;
+
+    public override async Task<LoginCommandResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        (string accessToken, string refreshToken) = await _authService.LoginAsync(
-            email: request.Email,
-            password: request.Password
-        );
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            User? user = await _userRepository.GetUserByEmailAsync(request.Email);
+            if (user is null)
+                throw new UnauthenticatedException("Invalid email or password.");
 
+            if (!_securityService.VerifySecret(
+                        secret: request.Password,
+                        secretHash: user.PasswordHash
+                    )
+                )
+                throw new UnauthenticatedException("Invalid email or password");
 
+            // All tokens for this session belong to one family ID
+            Guid tokenFamilyId = Guid.NewGuid();
 
-        return new LoginResult(
-            AccessToken: accessToken,
-            RefreshToken: refreshToken
-        );
+            string accessToken = await _jwtService.GenerateAccessTokenAsync(user);
+
+            RefreshToken refreshToken = _jwtService.CreateRefreshTokenEntityAsync(user, tokenFamilyId);
+
+            await _refreshTokenRepository.AddAsync(refreshToken);
+
+            // Hash the refresh token before storing it
+            user.RefreshTokens.Add(refreshToken);
+
+            // Updating the User in the DB with the new Refresh Token
+            await _userRepository.UpdateAsync(user);
+
+            _ = await _refreshTokenRepository.AddAsync(refreshToken);
+
+            await _unitOfWork.SaveAsync();
+            await _unitOfWork.CommitAsync();
+
+            return new LoginCommandResult(AccessToken: accessToken, RefreshToken: refreshToken.PlaintextToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("An error occurred during login: {Message}", ex.Message);
+            await _unitOfWork.RollbackAsync();
+            throw new AuthenticationException("Invalid email or password");
+        }
     }
 }

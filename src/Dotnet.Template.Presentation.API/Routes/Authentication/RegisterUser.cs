@@ -29,9 +29,9 @@ public class RegisterUser : ICommandRoute<RegisterUserCommand>
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        RegisterUserResult response = await mediator.Send(command);
+        RegisterUserCommandResult response = await mediator.Send(command);
         return Results.Created(
             $"/users/{response.user.Id}",
-            ApiResponse<RegisterUserResult>.SuccessResponse(response));
+            ApiResponse<RegisterUserCommandResult>.SuccessResponse(response));
     }
 }

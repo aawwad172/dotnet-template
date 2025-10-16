@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
 
-public class UnitOfWork(BaseDbContext context, ILogger<UnitOfWork> logger) : IUnitOfWork
+public class UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger) : IUnitOfWork
 {
-    private readonly BaseDbContext _context = context;
+    private readonly ApplicationDbContext _context = context;
     private readonly ILogger<UnitOfWork> _logger = logger;
     private IDbContextTransaction? _transaction;
 

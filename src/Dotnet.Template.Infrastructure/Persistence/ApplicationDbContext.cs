@@ -1,6 +1,8 @@
+using System.Reflection;
+
 using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Domain.Entities.Authentication;
-using Dotnet.Template.Domain.Interfaces.Application.Services;
+using Dotnet.Template.Domain.Interfaces.Domain.Auditing;
 using Dotnet.Template.Infrastructure.Configurations;
 using Dotnet.Template.Infrastructure.Configurations.Seed;
 
@@ -12,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
 
-public class BaseDbContext(DbContextOptions options, IServiceProvider serviceProvider, IConfiguration configuration) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions options, IServiceProvider serviceProvider, IConfiguration configuration) : DbContext(options)
 {
     protected IServiceProvider _serviceProvider { get; } = serviceProvider;
     private readonly IConfiguration _configuration = configuration;
@@ -27,6 +29,9 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        ApplySoftDeleteFilters(modelBuilder); // Cleaner call in OnModelCreating
+
         // Apply configurations in specific order
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UsersSeed(_configuration));
@@ -49,7 +54,7 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
     }
 
     // Logger service
-    private ILogger<BaseDbContext> Logger => _serviceProvider.GetRequiredService<ILogger<BaseDbContext>>();
+    private ILogger<ApplicationDbContext> Logger => _serviceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
@@ -81,5 +86,37 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
                 Logger.LogInformation($"Deleting entity: {entry.Entity.GetType().Name} - Values: {entry.OriginalValues.ToObject()}");
             }
         }
+    }
+
+    /// <summary>
+    /// Applies the global query filter for soft deletion to all entities 
+    /// that implement the ISoftDelete interface.
+    /// </summary>
+    /// <param name="modelBuilder">The model builder instance.</param>
+    private void ApplySoftDeleteFilters(ModelBuilder modelBuilder)
+    {
+        // Find all entity types that implement ISoftDelete
+        var softDeleteEntityTypes = modelBuilder.Model.GetEntityTypes()
+            .Where(e => typeof(ISoftDelete).IsAssignableFrom(e.ClrType));
+
+        // Apply the filter for each found entity
+        foreach (var entityType in softDeleteEntityTypes)
+        {
+            // Use a helper method to create and apply the non-generic filter expression
+            var method = typeof(ApplicationDbContext)
+                .GetMethod(nameof(SetSoftDeleteFilter), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(entityType.ClrType);
+
+            method.Invoke(null, new object[] { modelBuilder });
+        }
+    }
+
+    // A generic static method to create and apply the filter.
+    // Making it static avoids potential closure capture issues with the DbContext instance.
+    private static void SetSoftDeleteFilter<TEntity>(ModelBuilder modelBuilder) where TEntity : class, ISoftDelete
+    {
+        // The filter expression: entity.IsDeleted == false
+        modelBuilder.Entity<TEntity>().HasQueryFilter(
+            e => !EF.Property<bool>(e, nameof(ISoftDelete.IsDeleted)));
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
-public class RoleRepository(BaseDbContext context) : Repository<Role>(context), IRoleRepository
+public class RoleRepository(ApplicationDbContext context) : Repository<Role>(context), IRoleRepository
 {
     public async Task<Role?> GetRoleByNameAsync(string name)
     {

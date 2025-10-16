@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
-public class RefreshTokenRepository(BaseDbContext context, ISecurityService securityService) : Repository<RefreshToken>(context), IRefreshTokenRepository
+public class RefreshTokenRepository(ApplicationDbContext context, ISecurityService securityService) : Repository<RefreshToken>(context), IRefreshTokenRepository
 {
     private readonly ISecurityService _securityService = securityService;
     public async Task<RefreshToken?> GetByTokenAsync(string token, Guid userId)

@@ -1,5 +1,4 @@
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Interfaces.Application.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

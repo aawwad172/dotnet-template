@@ -2,7 +2,6 @@ using Dotnet.Template.Application;
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain;
-using Dotnet.Template.Domain.Entities.Authentication;
 using Dotnet.Template.Infrastructure;
 using Dotnet.Template.Presentation.API;
 using Dotnet.Template.Presentation.API.Configurations;
@@ -70,16 +69,16 @@ app.MapGet("/", () => new
 
 app.MapPost("/users/register", RegisterUser.RegisterRoute)
     .WithTags("Authentication")
-   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status201Created, "application/json")
+   .Produces<ApiResponse<RegisterUserCommandResult>>(StatusCodes.Status201Created, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status409Conflict, "application/json")
+   .Produces<ApiResponse<RegisterUserCommandResult>>(StatusCodes.Status409Conflict, "application/json")
    .Accepts<RegisterUserCommand>("application/json");
 
 app.MapPost("/users/login", Login.RegisterRoute)
     .WithTags("Authentication")
-   .Produces<ApiResponse<LoginResult>>(StatusCodes.Status200OK, "application/json")
+   .Produces<ApiResponse<LoginCommandResult>>(StatusCodes.Status200OK, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<LoginResult>>(StatusCodes.Status401Unauthorized, "application/json")
+   .Produces<ApiResponse<LoginCommandResult>>(StatusCodes.Status401Unauthorized, "application/json")
    .Accepts<LoginCommand>("application/json");
 
 app.MapPost("/users/refresh-token", RefreshToken.RegisterRoute)

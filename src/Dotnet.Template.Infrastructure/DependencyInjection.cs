@@ -17,7 +17,7 @@ public static class DependencyInjection
     {
         string connectionString = configuration.GetRequiredSetting("ConnectionStrings:DbConnectionString");
 
-        services.AddDbContext<BaseDbContext>((IServiceProvider provider, DbContextOptionsBuilder options) => options.UseNpgsql(connectionString));
+        services.AddDbContext<ApplicationDbContext>((IServiceProvider provider, DbContextOptionsBuilder options) => options.UseNpgsql(connectionString));
         // Add your repositories like this here
         // services.AddScoped<IRepository, Repository>();
 

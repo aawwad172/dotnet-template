@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
-public class AuthenticationRepository(BaseDbContext dbContext) : IAuthenticationRepository
+public class AuthenticationRepository(ApplicationDbContext dbContext) : IAuthenticationRepository
 {
-    private readonly BaseDbContext _dbContext = dbContext;
+    private readonly ApplicationDbContext _dbContext = dbContext;
 
     public async Task AddUserRoleAsync(UserRole userRole)
     {

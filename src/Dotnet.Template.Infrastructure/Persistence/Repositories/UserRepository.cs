@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
-public sealed class UserRepository(BaseDbContext dbContext) : Repository<User>(dbContext), IUserRepository
+public sealed class UserRepository(ApplicationDbContext dbContext) : Repository<User>(dbContext), IUserRepository
 {
     public async Task<User?> GetUserByEmailAsync(string email)
     {

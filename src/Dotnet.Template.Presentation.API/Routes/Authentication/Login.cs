@@ -32,8 +32,8 @@ public class Login : ICommandRoute<LoginCommand>
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        LoginResult response = await mediator.Send(request);
+        LoginCommandResult response = await mediator.Send(request);
         return Results.Ok(
-            ApiResponse<LoginResult>.SuccessResponse(response));
+            ApiResponse<LoginCommandResult>.SuccessResponse(response));
     }
 }

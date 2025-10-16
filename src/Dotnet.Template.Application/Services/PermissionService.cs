@@ -1,5 +1,4 @@
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Entities.Authentication;
 using Dotnet.Template.Domain.Interfaces.Application.Services;
 using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 
