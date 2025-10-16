@@ -1,5 +1,7 @@
+
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Domain.Exceptions;
+using Dotnet.Template.Presentation.API.Interfaces;
 using Dotnet.Template.Presentation.API.Models;
 
 using FluentValidation;
@@ -7,16 +9,18 @@ using FluentValidation.Results;
 
 using MediatR;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace Dotnet.Template.Presentation.API.Routes.Authentication;
 
-public class Login
+public class Login : ICommandRoute<LoginCommand>
 {
     public static async Task<IResult> RegisterRoute(
-               LoginCommand command,
-               IMediator mediator,
-               IValidator<LoginCommand> validator)
+        [FromBody] LoginCommand request,
+        [FromServices] IMediator mediator,
+        [FromServices] IValidator<LoginCommand> validator)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(command);
+        ValidationResult validationResult = await validator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
@@ -28,7 +32,7 @@ public class Login
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        LoginResult response = await mediator.Send(command);
+        LoginResult response = await mediator.Send(request);
         return Results.Ok(
             ApiResponse<LoginResult>.SuccessResponse(response));
     }

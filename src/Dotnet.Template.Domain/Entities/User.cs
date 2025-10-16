@@ -14,13 +14,12 @@ public class User : IBaseEntity
     public required string PasswordHash { get; set; }
     public required DateTime CreatedAt { get; init; }
     public required Guid CreatedBy { get; init; }
-    public DateTime UpdatedAt { get; set; }
-    public required Guid UpdatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public Guid? UpdatedBy { get; set; }
     public required bool IsActive { get; set; }
     public required string SecurityStamp { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<UserRole> UserRoles { get; set; } = [];
-    public ICollection<UserPermissionOverride> PermissionOverrides { get; set; } = [];
     public required bool IsDeleted { get; set; } = false;
     public required bool IsVerified { get; set; } = false;
 }

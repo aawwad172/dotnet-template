@@ -3,6 +3,7 @@ using System.Text;
 
 using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain.Entities.Authentication;
+using Dotnet.Template.Domain.Enums;
 using Dotnet.Template.Presentation.API.Validators.Commands.Authentication;
 
 using FluentValidation;
@@ -63,36 +64,20 @@ public static class DependencyInjection
 
         services.AddAuthorization(options =>
         {
-            // ------------------------------------------------------------------
-            // A. Role-Based Policies (For high-level access control)
-            // ------------------------------------------------------------------
+            // 1. Policy for creating a post (e.g., for /posts endpoint)
+            options.AddPolicy("PostApprove", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                // Check for a Claim with type "Permission" and value "Can_Create_Post"
+                policy.RequireClaim(CustomClaims.Permission, PermissionsEnum.PostApprove);
+            });
 
-            // 1. User Policy (Accessible by anyone who is a user)
-            // NOTE: If you have different user levels (Admin/SuperAdmin) that should also count as 'User',
-            // you must explicitly list them.
-            options.AddPolicy(PolicyNames.UserOnly, policy =>
-                policy.RequireRole("User", "Admin", "SuperAdmin", "SubAdmin"));
-
-            // 2. Admin or Above Policy (Standard Admin level access)
-            options.AddPolicy(PolicyNames.AdminOrAbove, policy =>
-                policy.RequireRole("Admin", "SuperAdmin"));
-
-            // 3. Super Admin Only Policy (Highest access level)
-            options.AddPolicy(PolicyNames.SuperAdminOnly, policy =>
-                policy.RequireRole("SuperAdmin"));
-
-            // ------------------------------------------------------------------
-            // B. Permission-Based Policies (Managed by Custom Handler)
-            // ------------------------------------------------------------------
-
-            // NOTE: You don't register individual permission policies here.
-            // They are handled dynamically by your custom IAuthorizationPolicyProvider, 
-            // which looks for the "Permission:" prefix, thus keeping this section clean.
-
-            /* Example of a dynamic policy (Do NOT un-comment, this is handled by your custom code):
-            options.AddPolicy("Permission:User.Create", policy =>
-                policy.Requirements.Add(new PermissionRequirement("User.Create")));
-            */
+            // 2. Policy for managing users (e.g., for /users/ endpoint)
+            options.AddPolicy("UserRead", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim(CustomClaims.Permission, PermissionsEnum.UserRead);
+            });
         });
 
         return services;

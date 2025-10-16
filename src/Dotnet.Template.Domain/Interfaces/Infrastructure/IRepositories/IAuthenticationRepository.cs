@@ -8,8 +8,6 @@ public interface IAuthenticationRepository
 
     // Permission Retrieval
     Task<List<string>> GetBaseGrantedPermissionsAsync(List<Guid> roleIds);
-    Task<List<UserPermissionOverride>> GetUserOverridesAsync(Guid userId);
-
     // Helper
     Task<List<Guid>> GetUserRoleIdsAsync(Guid userId);
     Task<bool> IsUserInRoleAsync(Guid userId, string roleName);

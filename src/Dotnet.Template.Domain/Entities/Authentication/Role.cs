@@ -3,7 +3,7 @@ using Dotnet.Template.Domain.Interfaces.Domain.Auditing;
 
 namespace Dotnet.Template.Domain.Entities.Authentication;
 
-public class Role : IEntity, ICreationAudit
+public class Role : IBaseEntity
 {
     public Guid Id { get; init; } = Guid.CreateVersion7();
 
@@ -16,4 +16,7 @@ public class Role : IEntity, ICreationAudit
     public ICollection<RolePermission> RolePermissions { get; init; } = [];
     public DateTime CreatedAt { get; init; }
     public Guid CreatedBy { get; init; }
+    public DateTime? UpdatedAt { get; set; }
+    public Guid? UpdatedBy { get; set; }
+    public bool IsDeleted { get; set; }
 }

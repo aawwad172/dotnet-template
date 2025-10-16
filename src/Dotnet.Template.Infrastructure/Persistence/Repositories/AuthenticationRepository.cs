@@ -31,15 +31,6 @@ public class AuthenticationRepository(BaseDbContext dbContext) : IAuthentication
             .ToListAsync();
     }
 
-    public async Task<List<UserPermissionOverride>> GetUserOverridesAsync(Guid userId)
-    {
-        // Get all explicit Grants/Deny rules for the user
-        return await _dbContext.UserPermissionOverrides
-            .Where(upo => upo.UserId == userId)
-            .Include(upo => upo.Permission) // Ensure the Permission Name is loaded
-            .ToListAsync();
-    }
-
     public async Task<List<Guid>> GetUserRoleIdsAsync(Guid userId)
     {
         return await _dbContext.UserRoles

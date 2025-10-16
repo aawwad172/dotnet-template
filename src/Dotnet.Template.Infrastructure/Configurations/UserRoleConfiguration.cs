@@ -28,9 +28,5 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 
         // Useful indexes
         builder.HasIndex(x => new { x.UserId, x.RoleId });
-
-        // Auditing
-        builder.Property(x => x.CreatedAt).IsRequired();
-        builder.Property(x => x.CreatedBy).IsRequired();
     }
 }

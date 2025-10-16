@@ -22,8 +22,6 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
-    public DbSet<UserPermissionOverride> UserPermissionOverrides { get; set; }
-
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,8 +43,6 @@ public class BaseDbContext(DbContextOptions options, IServiceProvider servicePro
 
         modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
         modelBuilder.ApplyConfiguration(new RolesPermissionsSeed());
-
-        modelBuilder.ApplyConfiguration(new UserPermissionOverrideConfiguration());
 
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
 

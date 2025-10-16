@@ -25,25 +25,6 @@ public class PermissionService(IAuthenticationRepository authenticationRepositor
 
         HashSet<string> finalPermissions = new(baseGrantedPermissions, StringComparer.OrdinalIgnoreCase);
 
-        // 3. --- Apply User Overrides (Business Rule) ---
-        List<UserPermissionOverride> overrides = await _authenticationRepository.GetUserOverridesAsync(user.Id);
-
-        foreach (UserPermissionOverride over in overrides)
-        {
-            var permissionName = over.Permission.Name;
-
-            if (over.IsGranted)
-            {
-                // Explicit GRANT: Add the permission
-                finalPermissions.Add(permissionName);
-            }
-            else
-            {
-                // Explicit DENY: Remove the permission
-                finalPermissions.Remove(permissionName);
-            }
-        }
-
         return finalPermissions.ToList();
     }
 

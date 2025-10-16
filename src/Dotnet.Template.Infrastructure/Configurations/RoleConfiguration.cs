@@ -33,5 +33,8 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .WithOne(rp => rp.Role)
             .HasForeignKey(rp => rp.RoleId)
             .OnDelete(DeleteBehavior.Cascade); // safe to remove role-permission links when a role is deleted
+
+        builder.Property(r => r.UpdatedAt).IsRequired(false);
+        builder.Property(r => r.UpdatedBy).IsRequired(false);
     }
 }

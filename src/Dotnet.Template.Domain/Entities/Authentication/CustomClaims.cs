@@ -8,7 +8,7 @@ namespace Dotnet.Template.Domain.Entities.Authentication;
 public static class CustomClaims
 {
     // This is the key we use to store all granular permissions in the JWT payload.
-    public const string Permission = "application_permission";
+    public const string Permission = "Permission";
 
     // This is the default .NET claim type for roles, often used with [Authorize(Roles="...")]
     // ClaimTypes.Role is defined in System.Security.Claims but it's good practice to list related claims

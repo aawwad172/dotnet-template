@@ -91,8 +91,6 @@ public sealed class AuthenticationService(
             {
                 UserId = user.Id,
                 RoleId = defaultRole.Id,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = user.Id
             };
             await _authenticationRepository.AddUserRoleAsync(userRole); // Assuming IAuthRepository has this method
 

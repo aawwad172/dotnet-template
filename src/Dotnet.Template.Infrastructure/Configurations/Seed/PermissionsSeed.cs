@@ -1,4 +1,5 @@
 using Dotnet.Template.Domain.Entities.Authentication;
+using Dotnet.Template.Domain.Enums;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,7 +15,7 @@ public class PermissionsSeed : IEntityTypeConfiguration<Permission>
             new Permission
             {
                 Id = AuthSeedConstants.PermissionIdUserRead,
-                Name = "User.Read",
+                Name = PermissionsEnum.UserRead,
                 Description = "some description",
                 CreatedAt = AuthSeedConstants.SeedDateUtc,
                 CreatedBy = AuthSeedConstants.SystemUserId
@@ -22,7 +23,7 @@ public class PermissionsSeed : IEntityTypeConfiguration<Permission>
             new Permission
             {
                 Id = AuthSeedConstants.PermissionIdPostApprove,
-                Name = "Post.Approve",
+                Name = PermissionsEnum.PostApprove,
                 CreatedAt = AuthSeedConstants.SeedDateUtc,
                 CreatedBy = AuthSeedConstants.SystemUserId
             }

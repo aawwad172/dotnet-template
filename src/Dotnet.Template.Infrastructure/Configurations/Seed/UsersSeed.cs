@@ -29,7 +29,20 @@ public class UsersSeed(IConfiguration configuration) : IEntityTypeConfiguration<
                     // Auditing: System created by System
                     CreatedAt = AuthSeedConstants.SeedDateUtc,
                     CreatedBy = AuthSeedConstants.SystemUserId,
-                    UpdatedBy = AuthSeedConstants.SystemUserId
+                },
+                new User {
+                    Id = AuthSeedConstants.InitialAdminUserId,
+                    FirstName = "Initial",
+                    LastName = "Admin",
+                    Username = "admin",
+                    Email = "aawwad172@gmail.com",
+                    PasswordHash = _configuration.GetRequiredSetting("Security:InitialAdminPasswordHash"),
+                    SecurityStamp = AuthSeedConstants.SeedDateUtc.ToString(),
+                    IsActive = true,
+                    IsVerified = true,
+                    IsDeleted = false,
+                    CreatedAt = AuthSeedConstants.SeedDateUtc,
+                    CreatedBy = AuthSeedConstants.SystemUserId,
                 }
             ]
         );

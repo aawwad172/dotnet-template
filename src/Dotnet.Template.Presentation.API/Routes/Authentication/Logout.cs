@@ -1,5 +1,6 @@
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Domain.Exceptions;
+using Dotnet.Template.Presentation.API.Interfaces;
 using Dotnet.Template.Presentation.API.Models;
 
 using FluentValidation;
@@ -9,7 +10,7 @@ using MediatR;
 
 namespace Dotnet.Template.Presentation.API.Routes.Authentication;
 
-public class Logout
+public class Logout : ICommandRoute<LogoutCommand>
 {
     public static async Task<IResult> RegisterRoute(
         LogoutCommand command,

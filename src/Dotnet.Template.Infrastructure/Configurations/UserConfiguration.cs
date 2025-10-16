@@ -51,8 +51,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Auditing
         builder.Property(u => u.CreatedAt).IsRequired();
         builder.Property(u => u.CreatedBy).IsRequired();
-        builder.Property(u => u.UpdatedAt).IsRequired();
-        builder.Property(u => u.UpdatedBy).IsRequired();
+        builder.Property(u => u.UpdatedAt).IsRequired(false);
+        builder.Property(u => u.UpdatedBy).IsRequired(false);
 
         // Relationships
         builder.HasMany(u => u.RefreshTokens)
@@ -64,11 +64,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasMany(u => u.UserRoles)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(u => u.PermissionOverrides)
-            .WithOne(po => po.User)
-            .HasForeignKey(po => po.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

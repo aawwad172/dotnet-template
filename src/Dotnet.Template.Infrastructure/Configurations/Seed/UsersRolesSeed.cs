@@ -16,8 +16,6 @@ public class UsersRolesSeed : IEntityTypeConfiguration<UserRole>
                 // The Composite Primary Key is UserId and RoleId
                 UserId = AuthSeedConstants.InitialAdminUserId,
                 RoleId = AuthSeedConstants.RoleIdSuperAdmin,
-                CreatedAt = AuthSeedConstants.SeedDateUtc,
-                CreatedBy = AuthSeedConstants.SystemUserId
             }
 
             // Add other initial user/role links here if necessary (e.g., Guest User, Test User)
