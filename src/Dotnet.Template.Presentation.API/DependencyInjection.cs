@@ -68,15 +68,14 @@ public static class DependencyInjection
             options.AddPolicy("PostApprove", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                // Check for a Claim with type "Permission" and value "Can_Create_Post"
-                policy.RequireClaim(CustomClaims.Permission, PermissionsEnum.PostApprove);
+                policy.RequireClaim(CustomClaims.Permission, PermissionConstants.PostApprove);
             });
 
             // 2. Policy for managing users (e.g., for /users/ endpoint)
             options.AddPolicy("UserRead", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireClaim(CustomClaims.Permission, PermissionsEnum.UserRead);
+                policy.RequireClaim(CustomClaims.Permission, PermissionConstants.UserRead);
             });
         });
 

@@ -11,4 +11,13 @@ public record RegisterUserCommand(
     string Username,
     string Password) : IRequest<RegisterUserCommandResult>;
 
-public record RegisterUserCommandResult(User user, string message);
+public record RegisterUserCommandResult(
+    Guid Id,
+    string FirstName,
+    string LastName,
+    string Email,
+    string Username,
+    bool IsActive,
+    bool IsVerified,
+    string Message
+);

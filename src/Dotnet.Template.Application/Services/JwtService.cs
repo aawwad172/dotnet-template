@@ -72,7 +72,7 @@ public class JwtService(
         return handler.CreateToken(tokenDescriptor);
     }
 
-    public RefreshToken CreateRefreshTokenEntityAsync(
+    public RefreshToken CreateRefreshTokenEntity(
         User user,
         Guid tokenFamilyId)
     {

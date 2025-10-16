@@ -19,7 +19,6 @@ public class LogoutCommandHandler(
     IUserRepository userRepository)
     : BaseHandler<LogoutCommand, LogoutCommandResult>(currentUserService, logger, unitOfWork)
 {
-    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
     private readonly ISecurityService _securityService = securityService;
     private readonly IUserRepository _userRepository = userRepository;
@@ -74,7 +73,7 @@ public class LogoutCommandHandler(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during login: {Message}", ex.Message);
+            _logger.LogError("An error occurred during logout: {Message}", ex.Message);
             await _unitOfWork.RollbackAsync();
             throw;
         }

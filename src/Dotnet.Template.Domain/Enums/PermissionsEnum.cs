@@ -1,8 +1,8 @@
 namespace Dotnet.Template.Domain.Enums;
 
-public static class PermissionsEnum
+public static class PermissionConstants
 {
-    public static string UserRead = "User.Read";
-    public static string PostApprove = "Post.Approve";
+    public const string UserRead = "User.Read";
+    public const string PostApprove = "Post.Approve";
 
 }

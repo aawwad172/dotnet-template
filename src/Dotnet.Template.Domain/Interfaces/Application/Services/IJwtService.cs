@@ -8,7 +8,7 @@ namespace Dotnet.Template.Domain.Interfaces.Application.Services;
 public interface IJwtService
 {
     Task<string> GenerateAccessTokenAsync(User user);
-    RefreshToken CreateRefreshTokenEntityAsync(
+    RefreshToken CreateRefreshTokenEntity(
         User user,
         Guid tokenFamilyId);
     Task<ClaimsPrincipal> ValidateToken(string token);

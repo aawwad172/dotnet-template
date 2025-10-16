@@ -22,7 +22,7 @@ public class UsersSeed(IConfiguration configuration) : IEntityTypeConfiguration<
                     Username = "system",
                     Email = "system@example.com",
                     PasswordHash = _configuration.GetRequiredSetting("Security:SystemAdminPasswordHash"), // Hash doesn't matter, but needs a value
-                    SecurityStamp = AuthSeedConstants.SeedDateUtc.ToString(),
+                    SecurityStamp = AuthSeedConstants.SystemSecurityStampGuid,
                     IsActive = true,
                     IsVerified = true,
                     IsDeleted = false,
@@ -37,7 +37,7 @@ public class UsersSeed(IConfiguration configuration) : IEntityTypeConfiguration<
                     Username = "admin",
                     Email = "aawwad172@gmail.com",
                     PasswordHash = _configuration.GetRequiredSetting("Security:InitialAdminPasswordHash"),
-                    SecurityStamp = AuthSeedConstants.SeedDateUtc.ToString(),
+                    SecurityStamp = AuthSeedConstants.AdminSecurityStampGuid,
                     IsActive = true,
                     IsVerified = true,
                     IsDeleted = false,

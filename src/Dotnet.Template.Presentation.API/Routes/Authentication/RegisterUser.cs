@@ -31,7 +31,7 @@ public class RegisterUser : ICommandRoute<RegisterUserCommand>
 
         RegisterUserCommandResult response = await mediator.Send(command);
         return Results.Created(
-            $"/users/{response.user.Id}",
+            $"/users/{response.Id}",
             ApiResponse<RegisterUserCommandResult>.SuccessResponse(response));
     }
 }

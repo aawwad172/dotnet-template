@@ -21,7 +21,6 @@ public class LoginCommandHandler(
     IRefreshTokenRepository refreshTokenRepository,
     IJwtService jwtService) : BaseHandler<LoginCommand, LoginCommandResult>(currentUserService, logger, unitOfWork)
 {
-    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ISecurityService _securityService = securityService;
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
@@ -48,17 +47,14 @@ public class LoginCommandHandler(
 
             string accessToken = await _jwtService.GenerateAccessTokenAsync(user);
 
-            RefreshToken refreshToken = _jwtService.CreateRefreshTokenEntityAsync(user, tokenFamilyId);
+            RefreshToken refreshToken = _jwtService.CreateRefreshTokenEntity(user, tokenFamilyId);
 
             await _refreshTokenRepository.AddAsync(refreshToken);
 
-            // Hash the refresh token before storing it
             user.RefreshTokens.Add(refreshToken);
 
             // Updating the User in the DB with the new Refresh Token
             await _userRepository.UpdateAsync(user);
-
-            _ = await _refreshTokenRepository.AddAsync(refreshToken);
 
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitAsync();

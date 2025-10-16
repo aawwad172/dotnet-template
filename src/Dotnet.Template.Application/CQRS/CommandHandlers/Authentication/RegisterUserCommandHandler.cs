@@ -75,7 +75,7 @@ public class RegisterUserCommandHandler(
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            _ = _userRepository.AddAsync(user);
+            await _userRepository.AddAsync(user);
 
             UserRole userRole = new()
             {
@@ -87,11 +87,19 @@ public class RegisterUserCommandHandler(
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitAsync();
 
-            return new RegisterUserCommandResult(user, "User registered successfully");
+            return new RegisterUserCommandResult(
+                Id: user.Id,
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                Email: user.Email,
+                Username: user.Username,
+                IsActive: user.IsActive,
+                IsVerified: user.IsVerified,
+                Message: "User registered successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during login: {Message}", ex.Message);
+            _logger.LogError("An error occurred during registration: {Message}", ex.Message);
             await _unitOfWork.RollbackAsync();
             throw;
         }

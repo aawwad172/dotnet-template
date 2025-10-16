@@ -4,7 +4,7 @@
 # Usage:
 #   ./rename_dotnet_template.sh NewName
 #
-# This script renames all occurrences of "Telegram.API" in:
+# This script renames all occurrences of "Dotnet.Template" in:
 #   1. File names (base name only; directory names remain for later processing)
 #   2. Directory names (deepest first)
 #   3. File contents (text replacements)

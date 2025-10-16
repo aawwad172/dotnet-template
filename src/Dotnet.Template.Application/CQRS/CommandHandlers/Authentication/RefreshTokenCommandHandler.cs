@@ -39,7 +39,7 @@ public class RefreshTokenCommandHandler(
         try
         {
             //  Generate a new refresh token
-            RefreshToken newRefreshToken = _jwtService.CreateRefreshTokenEntityAsync(user, oldToken.TokenFamilyId);
+            RefreshToken newRefreshToken = _jwtService.CreateRefreshTokenEntity(user, oldToken.TokenFamilyId);
 
             oldToken.RevokedAt = DateTime.UtcNow;
             oldToken.ReasonRevoked = "Rotated";
@@ -63,7 +63,7 @@ public class RefreshTokenCommandHandler(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during login: {Message}", ex.Message);
+            _logger.LogError("An error occurred during rotating token: {Message}", ex.Message);
             await _unitOfWork.RollbackAsync();
             throw;
         }

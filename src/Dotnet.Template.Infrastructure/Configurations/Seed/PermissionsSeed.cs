@@ -15,7 +15,7 @@ public class PermissionsSeed : IEntityTypeConfiguration<Permission>
             new Permission
             {
                 Id = AuthSeedConstants.PermissionIdUserRead,
-                Name = PermissionsEnum.UserRead,
+                Name = PermissionConstants.UserRead,
                 Description = "some description",
                 CreatedAt = AuthSeedConstants.SeedDateUtc,
                 CreatedBy = AuthSeedConstants.SystemUserId
@@ -23,7 +23,7 @@ public class PermissionsSeed : IEntityTypeConfiguration<Permission>
             new Permission
             {
                 Id = AuthSeedConstants.PermissionIdPostApprove,
-                Name = PermissionsEnum.PostApprove,
+                Name = PermissionConstants.PostApprove,
                 CreatedAt = AuthSeedConstants.SeedDateUtc,
                 CreatedBy = AuthSeedConstants.SystemUserId
             }
