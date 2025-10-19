@@ -51,7 +51,7 @@ public class LogoutCommandHandler(
 
 
             // 3. --- Revoke and Audit ---
-            token.RevokedAt = DateTime.UtcNow; // Corrected property name
+            token.RevokedAt = DateTime.UtcNow;
             token.ReasonRevoked = "Manual Logout";
 
             User? user = await _userRepository.GetByIdAsync(_currentUser.UserId);
@@ -59,16 +59,24 @@ public class LogoutCommandHandler(
             if (user is null)
                 throw new NotFoundException("Cannot find user");
 
+            // --------------------------------------------------------------------------
+            // CRITICAL: Rotate the SecurityStamp to invalidate all active Access Tokens
+            // The next time an active Access Token is presented, the SecurityStamp check
+            // in the JwtService.ValidateToken method will fail.
+            // --------------------------------------------------------------------------
+            user.SecurityStamp = Guid.NewGuid().ToString();
+
 
             // Mark the User as updated (optional, but good practice)
             user.UpdatedAt = DateTime.UtcNow;
-            user.SecurityStamp = Guid.NewGuid().ToString(); // Optional: Revoke all other sessions
-
             // Update the token entity in the repository.
             await _refreshTokenRepository.UpdateAsync(token!);
+            // Persist user changes as well (ensures persistence even if retrieved AsNoTracking)
+            await _userRepository.UpdateAsync(user);
 
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitAsync();
+
             return new LogoutCommandResult("Logout successful");
         }
         catch (Exception ex)
@@ -77,6 +85,5 @@ public class LogoutCommandHandler(
             await _unitOfWork.RollbackAsync();
             throw;
         }
-
     }
 }

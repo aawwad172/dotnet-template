@@ -7,6 +7,7 @@ using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Domain.Entities.Authentication;
 using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Domain.Interfaces.Application.Services;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -17,12 +18,14 @@ namespace Dotnet.Template.Application.Services;
 public class JwtService(
     IConfiguration configuration,
     IPermissionService permissionService,
-    ISecurityService securityService)
+    ISecurityService securityService,
+    IUserRepository userRepository)
     : IJwtService
 {
     private readonly IConfiguration _configuration = configuration;
     private readonly IPermissionService _permissionService = permissionService;
     private readonly ISecurityService _securityService = securityService;
+    private readonly IUserRepository _userRepository = userRepository;
     public async Task<string> GenerateAccessTokenAsync(User user)
     {
         // --- 1. Fetch ALL necessary claims from the service layer ---
@@ -37,7 +40,9 @@ public class JwtService(
             new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, user.Username),
             new(JwtRegisteredClaimNames.Email, user.Email),
-            new(JwtRegisteredClaimNames.Jti, Guid.CreateVersion7().ToString()) // Unique Token ID
+            new(JwtRegisteredClaimNames.Jti, Guid.CreateVersion7().ToString()), // Unique Token ID
+            // --- ADD SECURITY STAMP CLAIM HERE ---
+            new("security_stamp", user.SecurityStamp)
         };
 
         // --- 3. Add Role Claims ---
@@ -116,7 +121,35 @@ public class JwtService(
             throw new UnauthenticatedException("Invalid token");
         }
 
-        return new ClaimsPrincipal(result.ClaimsIdentity);
+        ClaimsPrincipal principal = new(result.ClaimsIdentity);
+
+        // 1. Get User ID and Stamp from the token
+        string? userIdClaim = principal.FindFirst(JwtRegisteredClaimNames.NameId)?.Value;
+        string? tokenSecurityStamp = principal.FindFirst("security_stamp")?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim) || string.IsNullOrEmpty(tokenSecurityStamp))
+        {
+            // Token is missing necessary claims, treat as invalid
+            throw new UnauthenticatedException("Token is missing required security claims.");
+        }
+
+        Guid userId = Guid.Parse(userIdClaim);
+
+        // 2. Fetch the current user stamp from the database (via a service)
+        // NOTE: You will need to implement GetCurrentSecurityStampAsync in your service.
+        User? user = await _userRepository.GetByIdAsync(userId);
+
+        if (user is null)
+            throw new UnauthenticatedException("Token required security claims is Invalid");
+
+        // 3. Compare the stamps
+        if (tokenSecurityStamp != user.SecurityStamp)
+            // The stamp was changed (e.g., due to logout or password change)
+            throw new UnauthenticatedException("Session revoked. Please log in again.");
+
+        // --- END NEW SECURITY STAMP VALIDATION LOGIC ---
+
+        return principal;
     }
 
     #region Private Helper Methods

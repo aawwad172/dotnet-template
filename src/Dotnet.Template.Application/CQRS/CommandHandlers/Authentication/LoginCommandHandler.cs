@@ -61,11 +61,17 @@ public class LoginCommandHandler(
 
             return new LoginCommandResult(AccessToken: accessToken, RefreshToken: refreshToken.PlaintextToken);
         }
+        catch (UnauthenticatedException)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during login: {Message}", ex.Message);
+            _logger.LogError(ex, "An error occurred during login.");
             await _unitOfWork.RollbackAsync();
-            throw new AuthenticationException("Invalid email or password");
+            // Preserve generic message but use the domain exception type used elsewhere.
+            throw new UnauthenticatedException("Invalid email or password.");
         }
     }
 }
