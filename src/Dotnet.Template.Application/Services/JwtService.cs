@@ -60,7 +60,11 @@ public class JwtService(
             claims.Add(new Claim(CustomClaims.Permission, permission));
         }
 
-        SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:JwtSecretKey")));
+        string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
+        byte[] keyBytes = TryDecodeBase64(secret) ?? Encoding.UTF8.GetBytes(secret);
+        if (keyBytes.Length < 32)
+            throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
+        SymmetricSecurityKey key = new(keyBytes);
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
         SecurityTokenDescriptor tokenDescriptor = new()
@@ -161,6 +165,18 @@ public class JwtService(
             rng.GetBytes(randomBytes);
         }
         return Convert.ToBase64String(randomBytes);
+    }
+
+    private static byte[]? TryDecodeBase64(string s)
+    {
+        try
+        {
+            // tolerate both base64 and base64url
+            if (s.Contains('_') || s.Contains('-'))
+                return Microsoft.IdentityModel.Tokens.Base64UrlEncoder.DecodeBytes(s);
+            return Convert.FromBase64String(s);
+        }
+        catch { return null; }
     }
     #endregion
 }

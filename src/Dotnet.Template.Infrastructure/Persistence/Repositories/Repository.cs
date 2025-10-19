@@ -21,7 +21,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<PaginationResult<T>> GetAllAsync(
+    public virtual async Task<PaginationResult<T>> GetAllAsync(
         int? pageNumber = null,
         int? pageSize = null,
         Expression<Func<T, bool>>? filter = null)
@@ -33,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         return await query.ToPagedQueryAsync(pageNumber, pageSize);
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }

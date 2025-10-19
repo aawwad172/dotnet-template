@@ -25,23 +25,33 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
         }
         catch (EnvironmentVariableNotSetException ex)
         {
-            _logger.LogWarning("EnvironmentVariableNotSetException occurred: {Message}", ex.Message);
+            _logger.LogError("EnvironmentVariableNotSetException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "ENV_VAR_MISSING", ex.Message, StatusCodes.Status500InternalServerError);
         }
         catch (ValidationException ex)
         {
-            _logger.LogWarning("ValidationException occurred: {Message}", ex.Message);
+            _logger.LogError("ValidationException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "VALIDATION_ERROR", ex.Message, StatusCodes.Status400BadRequest);
         }
         catch (UnauthenticatedException ex)
         {
-            _logger.LogWarning("UnauthenticatedException occurred: {Message}", ex.Message);
+            _logger.LogError("UnauthenticatedException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "UNAUTHENTICATED", ex.Message, StatusCodes.Status401Unauthorized);
         }
         catch (UnauthorizedException ex)
         {
-            _logger.LogWarning("UnauthorizedException occurred: {Message}", ex.Message);
+            _logger.LogError("UnauthorizedException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "UNAUTHORIZED", ex.Message, StatusCodes.Status403Forbidden);
+        }
+        catch (NotActiveUserExceptions ex)
+        {
+            _logger.LogWarning("NotActiveUserException occurred: {message}", ex.Message);
+            await HandleExceptionAsync(context, "NOT_ACTIVE_USER", ex.Message, StatusCodes.Status403Forbidden);
+        }
+        catch (DeletedUserException ex)
+        {
+            _logger.LogWarning("DeletedUserException occurred: {}", ex.Message);
+            await HandleExceptionAsync(context, "DELETED_USER", ex.Message, StatusCodes.Status403Forbidden);
         }
         catch (ConflictException ex)
         {

@@ -1,5 +1,3 @@
-using Dotnet.Template.Domain.Entities;
-
 using MediatR;
 
 namespace Dotnet.Template.Application.CQRS.Commands.Authentication;

@@ -1,6 +1,3 @@
-
-using System.Security.Authentication;
-
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Domain.Entities;
 using Dotnet.Template.Domain.Entities.Authentication;
@@ -34,6 +31,12 @@ public class LoginCommandHandler(
             User? user = await _userRepository.GetUserByEmailAsync(request.Email);
             if (user is null)
                 throw new UnauthenticatedException("Invalid email or password.");
+
+            if (user.IsActive is false)
+                throw new NotActiveUserExceptions($"User {user.Id} is not active");
+
+            if (user.IsDeleted is true)
+                throw new DeletedUserException($"User {user.Id} is deleted");
 
             if (!_securityService.VerifySecret(
                         secret: request.Password,

@@ -33,6 +33,9 @@ public class LogoutCommandHandler(
             // The repository will fetch the entity based on the PLAINTEXT token value 
             // by verifying the hash against the TokenHash/TokenSalt in the DB.
 
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+                throw new UnauthorizedException("Refresh token is required.");
+
             // This method must perform the hashing/lookup logic.
             RefreshToken? token = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken!, _currentUser.UserId);
 
