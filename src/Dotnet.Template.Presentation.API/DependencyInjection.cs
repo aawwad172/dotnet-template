@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text;
 
 using Dotnet.Template.Application.Utilities;
+using Dotnet.Template.Domain.Entities.Authentication;
 using Dotnet.Template.Domain.Enums;
 using Dotnet.Template.Presentation.API.Validators.Commands.Authentication;
 
@@ -38,18 +39,6 @@ public static class DependencyInjection
             configure.AddDebug();
         });
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("SuperAdminPolicy", policy =>
-                policy.RequireRole(RolesEnum.SuperAdmin.ToString()));
-
-            options.AddPolicy("AdminPolicy", policy =>
-                policy.RequireRole(RolesEnum.Admin.ToString()));
-
-            options.AddPolicy("UserPolicy", policy =>
-                policy.RequireRole(RolesEnum.User.ToString()));
-        });
-
         // Optionally, register pipeline behaviors (for example, a transactional behavior).
         // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
@@ -71,6 +60,23 @@ public static class DependencyInjection
                 ValidAudience = configuration.GetRequiredSetting("Jwt:Audience"),
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetRequiredSetting("Jwt:JwtSecretKey")))
             };
+        });
+
+        services.AddAuthorization(options =>
+        {
+            // 1. Policy for creating a post (e.g., for /posts endpoint)
+            options.AddPolicy("PostApprove", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim(CustomClaims.Permission, PermissionConstants.PostApprove);
+            });
+
+            // 2. Policy for managing users (e.g., for /users/ endpoint)
+            options.AddPolicy("UserRead", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim(CustomClaims.Permission, PermissionConstants.UserRead);
+            });
         });
 
         return services;

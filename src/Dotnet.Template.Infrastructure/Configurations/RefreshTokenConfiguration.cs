@@ -1,4 +1,4 @@
-using Dotnet.Template.Domain.Entities;
+using Dotnet.Template.Domain.Entities.Authentication;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,32 +9,29 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.HasKey(refreshToken => refreshToken.Id);
+        builder.HasKey(x => x.Id);
 
-        builder.Property(refreshToken => refreshToken.Id)
-            .IsRequired();
+        builder.Property(x => x.TokenHash).IsRequired().HasMaxLength(512);
 
-        builder.Property(refreshToken => refreshToken.Token)
-            .IsRequired();
+        builder.Property(x => x.ReasonRevoked).HasMaxLength(128);
+        builder.Property(x => x.SecurityStampAtIssue).HasMaxLength(128);
 
-        builder.Property(refreshToken => refreshToken.Expires)
-            .IsRequired();
+        builder.Ignore(rt => rt.PlaintextToken);
 
-        builder.Property(refreshToken => refreshToken.ReplacedByToken)
-            .IsRequired(false);
+        builder.HasOne(x => x.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(refreshToken => refreshToken.CreatedAt)
-            .IsRequired();
+        builder.HasOne(x => x.ReplacedByToken)
+            .WithMany()
+            .HasForeignKey(x => x.ReplacedByTokenId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Property(refreshToken => refreshToken.CreatedBy)
-            .IsRequired();
-
-        builder.Property(refreshToken => refreshToken.UserId)
-            .IsRequired();
-
-        builder.HasOne(refreshToken => refreshToken.User)
-            .WithMany(user => user.RefreshTokens)
-            .HasForeignKey(refreshToken => refreshToken.UserId);
+        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => new { x.UserId, x.TokenFamilyId });
+        builder.HasIndex(x => x.ExpiresAt);
+        builder.HasIndex(x => x.TokenHash).IsUnique(); // fast lookup by presented token (after hashing)
     }
 }
 

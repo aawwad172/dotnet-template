@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 
 using Dotnet.Template.Domain.Entities;
-using Dotnet.Template.Domain.Interfaces;
-using Dotnet.Template.Domain.Interfaces.IRepositories;
+using Dotnet.Template.Domain.Interfaces.Domain;
+using Dotnet.Template.Domain.Interfaces.Infrastructure.IRepositories;
 using Dotnet.Template.Infrastructure.Pagination;
 
 using Microsoft.EntityFrameworkCore;
@@ -12,16 +12,16 @@ namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class, IEntity
 {
-    private readonly BaseDbContext _context;
+    private readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public Repository(BaseDbContext context)
+    public Repository(ApplicationDbContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<PaginationResult<T>> GetAllAsync(
+    public virtual async Task<PaginationResult<T>> GetAllAsync(
         int? pageNumber = null,
         int? pageSize = null,
         Expression<Func<T, bool>>? filter = null)
@@ -33,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         return await query.ToPagedQueryAsync(pageNumber, pageSize);
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }

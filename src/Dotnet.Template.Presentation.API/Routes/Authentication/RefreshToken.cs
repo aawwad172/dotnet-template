@@ -1,5 +1,6 @@
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Domain.Exceptions;
+using Dotnet.Template.Presentation.API.Interfaces;
 using Dotnet.Template.Presentation.API.Models;
 
 using FluentValidation;
@@ -9,7 +10,7 @@ using MediatR;
 
 namespace Dotnet.Template.Presentation.API.Routes.Authentication;
 
-public class RefreshToken
+public class RefreshToken : ICommandRoute<RefreshTokenCommand>
 {
     public static async Task<IResult> RegisterRoute(
                    RefreshTokenCommand command,
@@ -28,8 +29,8 @@ public class RefreshToken
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        RefreshTokenResult? response = await mediator.Send(command);
+        RefreshTokenCommandResult? response = await mediator.Send(command);
         return Results.Ok(
-            ApiResponse<RefreshTokenResult>.SuccessResponse(response));
+            ApiResponse<RefreshTokenCommandResult>.SuccessResponse(response));
     }
 }

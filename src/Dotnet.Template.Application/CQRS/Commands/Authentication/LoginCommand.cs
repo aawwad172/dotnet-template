@@ -2,6 +2,6 @@ using MediatR;
 
 namespace Dotnet.Template.Application.CQRS.Commands.Authentication;
 
-public record LoginCommand(string Email, string Password) : IRequest<LoginResult>;
+public record LoginCommand(string Email, string Password) : IRequest<LoginCommandResult>;
 
-public record LoginResult(string AccessToken, string RefreshToken);
+public record LoginCommandResult(string AccessToken, string RefreshToken);

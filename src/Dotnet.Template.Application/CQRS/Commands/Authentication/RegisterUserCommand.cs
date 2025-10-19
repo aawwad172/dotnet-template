@@ -1,5 +1,3 @@
-using Dotnet.Template.Domain.Entities;
-
 using MediatR;
 
 namespace Dotnet.Template.Application.CQRS.Commands.Authentication;
@@ -9,6 +7,15 @@ public record RegisterUserCommand(
     string LastName,
     string Email,
     string Username,
-    string Password) : IRequest<RegisterUserResult>;
+    string Password) : IRequest<RegisterUserCommandResult>;
 
-public record RegisterUserResult(User user, string message);
+public record RegisterUserCommandResult(
+    Guid Id,
+    string FirstName,
+    string LastName,
+    string Email,
+    string Username,
+    bool IsActive,
+    bool IsVerified,
+    string Message
+);

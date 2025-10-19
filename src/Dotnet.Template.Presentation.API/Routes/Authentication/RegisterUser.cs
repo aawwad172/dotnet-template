@@ -1,5 +1,6 @@
 using Dotnet.Template.Application.CQRS.Commands.Authentication;
 using Dotnet.Template.Domain.Exceptions;
+using Dotnet.Template.Presentation.API.Interfaces;
 using Dotnet.Template.Presentation.API.Models;
 
 using FluentValidation;
@@ -9,7 +10,7 @@ using MediatR;
 
 namespace Dotnet.Template.Presentation.API.Routes.Authentication;
 
-public class RegisterUser
+public class RegisterUser : ICommandRoute<RegisterUserCommand>
 {
     public static async Task<IResult> RegisterRoute(
            RegisterUserCommand command,
@@ -28,9 +29,9 @@ public class RegisterUser
             throw new CustomValidationException("Validation failed", errors);
         }
 
-        RegisterUserResult response = await mediator.Send(command);
+        RegisterUserCommandResult response = await mediator.Send(command);
         return Results.Created(
-            $"/users/{response.user.Id}",
-            ApiResponse<RegisterUserResult>.SuccessResponse(response));
+            $"/users/{response.Id}",
+            ApiResponse<RegisterUserCommandResult>.SuccessResponse(response));
     }
 }

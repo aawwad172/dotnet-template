@@ -9,6 +9,8 @@ using Dotnet.Template.Presentation.API.Middlewares;
 using Dotnet.Template.Presentation.API.Models;
 using Dotnet.Template.Presentation.API.Routes.Authentication;
 
+using RefreshToken = Dotnet.Template.Presentation.API.Routes.Authentication.RefreshToken;
+
 WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks()
@@ -24,13 +26,16 @@ builder.Services.AddDomain()
                 .AddInfrastructure(builder.Configuration)
                 .AddPresentation(builder.Configuration);
 
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+
 WebApplication app = builder.Build();
 
 // Map health check endpoint
 app.MapHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.DocumentTitle = "Dotnet Template API");
@@ -62,28 +67,33 @@ app.MapGet("/", () => new
 
 #region Authentication
 
-app.MapPost("/users/register", RegisterUser.RegisterRoute).WithTags("Authentication")
-   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status201Created, "application/json")
+app.MapPost("/users/register", RegisterUser.RegisterRoute)
+    .WithTags("Authentication")
+   .Produces<ApiResponse<RegisterUserCommandResult>>(StatusCodes.Status201Created, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<RegisterUserResult>>(StatusCodes.Status409Conflict, "application/json")
+   .Produces<ApiResponse<RegisterUserCommandResult>>(StatusCodes.Status409Conflict, "application/json")
    .Accepts<RegisterUserCommand>("application/json");
 
-app.MapPost("/users/login", Login.RegisterRoute).WithTags("Authentication")
-   .Produces<ApiResponse<LoginResult>>(StatusCodes.Status200OK, "application/json")
+app.MapPost("/users/login", Login.RegisterRoute)
+    .WithTags("Authentication")
+   .Produces<ApiResponse<LoginCommandResult>>(StatusCodes.Status200OK, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<LoginResult>>(StatusCodes.Status401Unauthorized, "application/json")
+   .Produces<ApiResponse<LoginCommandResult>>(StatusCodes.Status401Unauthorized, "application/json")
    .Accepts<LoginCommand>("application/json");
 
-app.MapPost("/users/refresh-token", RefreshToken.RegisterRoute).WithTags("Authentication")
-   .Produces<ApiResponse<RefreshTokenResult>>(StatusCodes.Status200OK, "application/json")
+app.MapPost("/users/refresh-token", RefreshToken.RegisterRoute)
+    .WithTags("Authentication")
+   .Produces<ApiResponse<RefreshTokenCommandResult>>(StatusCodes.Status200OK, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<RefreshTokenResult>>(StatusCodes.Status401Unauthorized, "application/json")
+   .Produces<ApiResponse<RefreshTokenCommandResult>>(StatusCodes.Status401Unauthorized, "application/json")
    .Accepts<RefreshTokenCommand>("application/json");
 
-app.MapPost("/users/logout", Logout.RegisterRoute).WithTags("Authentication").RequireAuthorization("UserPolicy")
-   .Produces<ApiResponse<LogoutResult>>(StatusCodes.Status200OK, "application/json")
+app.MapPost("/users/logout", Logout.RegisterRoute)
+    .WithTags("Authentication")
+    .RequireAuthorization("UserRead", "PostApprove")
+   .Produces<ApiResponse<LogoutCommandResult>>(StatusCodes.Status200OK, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
-   .Produces<ApiResponse<LogoutResult>>(StatusCodes.Status401Unauthorized, "application/json")
+   .Produces<ApiResponse<LogoutCommandResult>>(StatusCodes.Status401Unauthorized, "application/json")
    .Accepts<LogoutCommand>("application/json");
 
 #endregion
