@@ -84,7 +84,7 @@ public class LogoutCommandHandler(
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred during logout: {Message}", ex.Message);
+            _logger.LogError(ex, "An error occurred during logout.");
             await _unitOfWork.RollbackAsync();
             throw;
         }

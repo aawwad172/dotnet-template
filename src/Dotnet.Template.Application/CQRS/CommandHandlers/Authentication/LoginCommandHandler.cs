@@ -33,7 +33,7 @@ public class LoginCommandHandler(
                 throw new UnauthenticatedException("Invalid email or password.");
 
             if (user.IsActive is false)
-                throw new NotActiveUserExceptions($"User {user.Id} is not active");
+                throw new NotActiveUserException($"User {user.Id} is not active");
 
             if (user.IsDeleted is true)
                 throw new DeletedUserException($"User {user.Id} is deleted");

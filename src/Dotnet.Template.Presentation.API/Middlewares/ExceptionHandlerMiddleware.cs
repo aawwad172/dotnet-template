@@ -43,14 +43,14 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
             _logger.LogError("UnauthorizedException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "UNAUTHORIZED", ex.Message, StatusCodes.Status403Forbidden);
         }
-        catch (NotActiveUserExceptions ex)
+        catch (NotActiveUserException ex)
         {
-            _logger.LogWarning("NotActiveUserException occurred: {message}", ex.Message);
+            _logger.LogWarning("NotActiveUserException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "NOT_ACTIVE_USER", ex.Message, StatusCodes.Status403Forbidden);
         }
         catch (DeletedUserException ex)
         {
-            _logger.LogWarning("DeletedUserException occurred: {}", ex.Message);
+            _logger.LogWarning("DeletedUserException occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, "DELETED_USER", ex.Message, StatusCodes.Status403Forbidden);
         }
         catch (ConflictException ex)

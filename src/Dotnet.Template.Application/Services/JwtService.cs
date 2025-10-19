@@ -62,8 +62,10 @@ public class JwtService(
 
         string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
         byte[] keyBytes = TryDecodeBase64(secret) ?? Encoding.UTF8.GetBytes(secret);
+
         if (keyBytes.Length < 32)
             throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
+
         SymmetricSecurityKey key = new(keyBytes);
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
@@ -105,14 +107,19 @@ public class JwtService(
     public async Task<ClaimsPrincipal> ValidateToken(string token)
     {
         JsonWebTokenHandler? tokenHandler = new();
-        byte[]? key = Encoding.UTF8.GetBytes(_configuration.GetRequiredSetting("Jwt:JwtSecretKey"));
+        string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
+        byte[] keyBytes = TryDecodeBase64(secret) ?? Encoding.UTF8.GetBytes(secret);
+
+        if (keyBytes.Length < 32)
+            throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
 
         TokenValidationParameters? validationParameters = new()
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
             ValidateIssuer = true,
             ValidateAudience = true,
+            ValidateLifetime = true,
             ValidIssuer = _configuration.GetRequiredSetting("Jwt:Issuer"),
             ValidAudience = _configuration.GetRequiredSetting("Jwt:Audience"),
             ClockSkew = TimeSpan.Zero
