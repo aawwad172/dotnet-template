@@ -69,10 +69,15 @@ public class JwtService(
         SymmetricSecurityKey key = new(keyBytes);
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
+        var expires = DateTime.UtcNow.AddMinutes(
+                int.TryParse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"), out int minutes)
+                ? minutes
+                : throw new EnvironmentVariableNotSetException("Jwt:AccessTokenExpirationMinutes must be a valid integer."));
+
         SecurityTokenDescriptor tokenDescriptor = new()
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"))),
+            Expires = expires,
             SigningCredentials = creds,
             Issuer = _configuration.GetRequiredSetting("Jwt:Issuer"),
             Audience = _configuration.GetRequiredSetting("Jwt:Audience")
@@ -89,13 +94,18 @@ public class JwtService(
     {
         string plaintextToken = GenerateRefreshToken();
         string combinedHashSalt = _securityService.HashSecret(plaintextToken);
+        var expiresAt = DateTime.UtcNow.AddDays(
+                int.TryParse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"), out int days)
+                ? days
+                : throw new InvalidOperationException("Jwt:RefreshTokenExpirationDays must be a valid integer."));
+
         RefreshToken refreshToken = new()
         {
             Id = Guid.CreateVersion7(),
             TokenHash = combinedHashSalt,
             PlaintextToken = plaintextToken,
             UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(int.Parse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"))),
+            ExpiresAt = expiresAt,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = user.Id,
             TokenFamilyId = tokenFamilyId
@@ -144,7 +154,8 @@ public class JwtService(
             throw new UnauthenticatedException("Token is missing required security claims.");
         }
 
-        Guid userId = Guid.Parse(userIdClaim);
+        if (!Guid.TryParse(userIdClaim, out Guid userId))
+            throw new UnauthenticatedException("Token contains invalid user identifier.");
 
         // 2. Fetch the current user stamp from the database (via a service)
         // NOTE: You will need to implement GetCurrentSecurityStampAsync in your service.
