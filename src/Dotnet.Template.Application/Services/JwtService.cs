@@ -69,10 +69,10 @@ public class JwtService(
         SymmetricSecurityKey key = new(keyBytes);
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
-        var expires = DateTime.UtcNow.AddMinutes(
+        DateTime expires = DateTime.UtcNow.AddMinutes(
                 int.TryParse(_configuration.GetRequiredSetting("Jwt:AccessTokenExpirationMinutes"), out int minutes)
                 ? minutes
-                : throw new EnvironmentVariableNotSetException("Jwt:AccessTokenExpirationMinutes must be a valid integer."));
+                : throw new InvalidOperationException("Jwt:AccessTokenExpirationMinutes must be a valid integer."));
 
         SecurityTokenDescriptor tokenDescriptor = new()
         {
@@ -94,7 +94,7 @@ public class JwtService(
     {
         string plaintextToken = GenerateRefreshToken();
         string combinedHashSalt = _securityService.HashSecret(plaintextToken);
-        var expiresAt = DateTime.UtcNow.AddDays(
+        DateTime expiresAt = DateTime.UtcNow.AddDays(
                 int.TryParse(_configuration.GetRequiredSetting("Jwt:RefreshTokenExpirationDays"), out int days)
                 ? days
                 : throw new InvalidOperationException("Jwt:RefreshTokenExpirationDays must be a valid integer."));

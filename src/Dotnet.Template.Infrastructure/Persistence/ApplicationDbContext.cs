@@ -8,6 +8,7 @@ using Dotnet.Template.Infrastructure.Configurations.Seed;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -96,14 +97,14 @@ public class ApplicationDbContext(DbContextOptions options, IServiceProvider ser
     private void ApplySoftDeleteFilters(ModelBuilder modelBuilder)
     {
         // Find all entity types that implement ISoftDelete
-        var softDeleteEntityTypes = modelBuilder.Model.GetEntityTypes()
+        IEnumerable<IMutableEntityType> softDeleteEntityTypes = modelBuilder.Model.GetEntityTypes()
             .Where(e => typeof(ISoftDelete).IsAssignableFrom(e.ClrType));
 
         // Apply the filter for each found entity
-        foreach (var entityType in softDeleteEntityTypes)
+        foreach (IMutableEntityType? entityType in softDeleteEntityTypes)
         {
             // Use a helper method to create and apply the non-generic filter expression
-            var method = typeof(ApplicationDbContext)
+            MethodInfo method = typeof(ApplicationDbContext)
                 .GetMethod(nameof(SetSoftDeleteFilter), BindingFlags.NonPublic | BindingFlags.Static)!
                 .MakeGenericMethod(entityType.ClrType);
 
