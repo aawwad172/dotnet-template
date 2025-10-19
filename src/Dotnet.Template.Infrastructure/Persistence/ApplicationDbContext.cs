@@ -15,10 +15,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Dotnet.Template.Infrastructure.Persistence;
 
-public class ApplicationDbContext(DbContextOptions options, IServiceProvider serviceProvider, IConfiguration configuration) : DbContext(options)
+public class ApplicationDbContext(
+    DbContextOptions<ApplicationDbContext> options,
+    IConfiguration configuration,
+    ILogger<ApplicationDbContext> logger)
+    : DbContext(options)
 {
-    protected IServiceProvider _serviceProvider { get; } = serviceProvider;
     private readonly IConfiguration _configuration = configuration;
+    private readonly ILogger<ApplicationDbContext> _logger = logger;
     // DbSet properties for the main entities and join tables
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -54,9 +58,7 @@ public class ApplicationDbContext(DbContextOptions options, IServiceProvider ser
 
     }
 
-    // Logger service
-    private ILogger<ApplicationDbContext> Logger => _serviceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
-
+    // _logger service
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         // Log database changes before saving
@@ -65,7 +67,7 @@ public class ApplicationDbContext(DbContextOptions options, IServiceProvider ser
         int result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 
         // Log successful save
-        Logger.LogInformation("Database changes successfully saved. Affected rows: {Result}", result);
+        _logger.LogInformation("Database changes successfully saved. Affected rows: {Result}", result);
 
         return result;
     }
@@ -76,15 +78,15 @@ public class ApplicationDbContext(DbContextOptions options, IServiceProvider ser
         {
             if (entry.State == EntityState.Added)
             {
-                Logger.LogInformation($"Adding new entity: {entry.Entity.GetType().Name} - Values: {entry.CurrentValues.ToObject()}");
+                _logger.LogInformation($"Adding new entity: {entry.Entity.GetType().Name} - Values: {entry.CurrentValues.ToObject()}");
             }
             else if (entry.State == EntityState.Modified)
             {
-                Logger.LogInformation($"Updating entity: {entry.Entity.GetType().Name} - Old Values: {entry.OriginalValues.ToObject()} - New Values: {entry.CurrentValues.ToObject()}");
+                _logger.LogInformation($"Updating entity: {entry.Entity.GetType().Name} - Old Values: {entry.OriginalValues.ToObject()} - New Values: {entry.CurrentValues.ToObject()}");
             }
             else if (entry.State == EntityState.Deleted)
             {
-                Logger.LogInformation($"Deleting entity: {entry.Entity.GetType().Name} - Values: {entry.OriginalValues.ToObject()}");
+                _logger.LogInformation($"Deleting entity: {entry.Entity.GetType().Name} - Values: {entry.OriginalValues.ToObject()}");
             }
         }
     }
