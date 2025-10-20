@@ -75,8 +75,8 @@ public class JwtMiddleware(
                     var handler = new JwtSecurityTokenHandler();
                     var jwtToken = handler.ReadJwtToken(token);
 
-                    string? userId = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value
-                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                    string? userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value
                                      ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value
                                      ?? jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
