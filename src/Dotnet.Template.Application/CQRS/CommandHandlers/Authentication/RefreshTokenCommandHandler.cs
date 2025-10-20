@@ -23,7 +23,7 @@ public class RefreshTokenCommandHandler(
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IJwtService _jwtService = jwtService;
 
-    public async override Task<RefreshTokenCommandResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public override async Task<RefreshTokenCommandResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         RefreshToken? oldToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, _currentUser.UserId);
 
@@ -45,7 +45,7 @@ public class RefreshTokenCommandHandler(
             oldToken.ReasonRevoked = "Rotated";
             oldToken.ReplacedByTokenId = newRefreshToken.Id; // CRITICAL: Link to the new token ID
 
-            await _refreshTokenRepository.UpdateAsync(oldToken);
+            _refreshTokenRepository.Update(oldToken);
 
             // Add the new refresh token to the repository
             await _refreshTokenRepository.AddAsync(newRefreshToken);

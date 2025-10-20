@@ -56,8 +56,9 @@ public class LoginCommandHandler(
 
             user.RefreshTokens.Add(refreshToken);
 
-            // Updating the User in the DB with the new Refresh Token
-            await _userRepository.UpdateAsync(user);
+            // --- REMOVE THE REDUNDANT CALL ---
+            // await _userRepository.UpdateAsync(user); // <--- REMOVE THIS LINE!!!
+            // ----------------------------------
 
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitAsync();

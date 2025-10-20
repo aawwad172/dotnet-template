@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dotnet.Template.Infrastructure.Persistence.Repositories;
 
-public class RefreshTokenRepository(ApplicationDbContext context, ISecurityService securityService) : Repository<RefreshToken>(context), IRefreshTokenRepository
+public class RefreshTokenRepository(
+    ApplicationDbContext context,
+    ISecurityService securityService)
+    : Repository<RefreshToken>(context), IRefreshTokenRepository
 {
     private readonly ISecurityService _securityService = securityService;
     public async Task<RefreshToken?> GetByTokenAsync(string token, Guid userId)
@@ -15,8 +18,9 @@ public class RefreshTokenRepository(ApplicationDbContext context, ISecurityServi
         // Fetch only active, non-expired tokens belonging to this user.
         // We fetch the HASH and SALT which are required for verification.
         List<RefreshToken> candidateTokens = await _dbSet
-            .Where(rt => rt.UserId == userId && !rt.RevokedAt.HasValue && rt.ExpiresAt > DateTime.UtcNow)
-            .ToListAsync();
+            .Where(rt => rt.UserId == userId
+                        && !rt.RevokedAt.HasValue
+                        && rt.ExpiresAt > DateTime.UtcNow).ToListAsync();
 
         // If the user has no tokens, exit early.
         if (!candidateTokens.Any())

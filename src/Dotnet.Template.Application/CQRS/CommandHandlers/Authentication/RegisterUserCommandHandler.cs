@@ -26,7 +26,7 @@ public class RegisterUserCommandHandler(
     private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly string _defaultRoleName = "User";
 
-    public async override Task<RegisterUserCommandResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public override async Task<RegisterUserCommandResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         // Check if a user already exists with the same email.
         User? existingUser = await _userRepository.GetUserByEmailAsync(request.Email);

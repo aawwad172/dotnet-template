@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 using Dotnet.Template.Application.Services;
@@ -40,11 +41,15 @@ public class JwtMiddleware(
                 {
                     context.User = principal;
 
-                    // set the current user service properties (safe because CurrentUserService is scoped)
-                    // try common claim types: NameIdentifier (ClaimTypes.NameIdentifier), "sub", "id"
-                    var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                 ?? principal.FindFirst("sub")?.Value
-                                 ?? principal.FindFirst("id")?.Value;
+
+                    // Try the short alias ('nameid') which is the standard JWT name for the ID.
+                    string? userId = principal.FindFirst(JwtRegisteredClaimNames.NameId)?.Value
+                                     // Fallback to other common aliases if needed
+                                     ?? principal.FindFirst("sub")?.Value
+                                     ?? principal.FindFirst("id")?.Value;
+
+                    // If you want to keep the .NET URI constant, ensure you check that too:
+                    userId ??= principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                     if (!string.IsNullOrEmpty(userId))
                     {

@@ -83,6 +83,7 @@ app.MapPost("/users/login", Login.RegisterRoute)
 
 app.MapPost("/users/refresh-token", RefreshToken.RegisterRoute)
     .WithTags("Authentication")
+    .RequireAuthorization("UserRead")
    .Produces<ApiResponse<RefreshTokenCommandResult>>(StatusCodes.Status200OK, "application/json")
    .Produces<ApiResponse<IEnumerable<string>>>(StatusCodes.Status400BadRequest, "application/json")
    .Produces<ApiResponse<RefreshTokenCommandResult>>(StatusCodes.Status401Unauthorized, "application/json")

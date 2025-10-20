@@ -62,17 +62,24 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
     /// Updates an entity.
     /// If the entity is not found, returns null so the service can handle it.
     /// </summary>
-    public async Task<T?> UpdateAsync(T entity)
+    public T? Update(T entity)
     {
-        // Attempt to find the entity in the database
-        T? existingEntity = await _dbSet.FindAsync(entity.Id);
-        if (existingEntity is null)
-            // Return null instead of throwing an exception.
-            return null;
+        // We assume the entity has either been fetched and is tracked, OR it is detached.
+        // We only explicitly update the entity if it is NOT currently tracked.
 
-        // Otherwise, update the entity.
-        _context.Entry(existingEntity).State = EntityState.Detached;
-        EntityEntry<T> result = _dbSet.Update(entity);
-        return result.Entity;
+        EntityEntry<T> entry = _context.Entry(entity);
+
+        if (entry.State == EntityState.Detached)
+        {
+            // If detached, attach the entity and mark it as modified.
+            // This is the cleanest way to update an entity that came from outside the context.
+            _dbSet.Attach(entity);
+            entry.State = EntityState.Modified;
+        }
+        // If the entity is already tracked (like in your login handler), its state is already
+        // marked as 'Modified' or 'Unchanged'. We just let the change tracker handle it.
+
+        // Return the entity for fluent API chaining if needed.
+        return entity;
     }
 }
