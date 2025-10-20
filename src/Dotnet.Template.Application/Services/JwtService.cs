@@ -60,12 +60,7 @@ public class JwtService(
             claims.Add(new Claim(CustomClaims.Permission, permission));
         }
 
-        string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
-        byte[] keyBytes = TryDecodeBase64(secret) ?? Encoding.UTF8.GetBytes(secret);
-
-        if (keyBytes.Length < 32)
-            throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
-
+        byte[] keyBytes = GetKeyBytes();
         SymmetricSecurityKey key = new(keyBytes);
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
@@ -108,6 +103,7 @@ public class JwtService(
             ExpiresAt = expiresAt,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = user.Id,
+            SecurityStampAtIssue = user.SecurityStamp,
             TokenFamilyId = tokenFamilyId
         };
 
@@ -117,11 +113,7 @@ public class JwtService(
     public async Task<ClaimsPrincipal> ValidateToken(string token)
     {
         JsonWebTokenHandler? tokenHandler = new();
-        string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
-        byte[] keyBytes = TryDecodeBase64(secret) ?? Encoding.UTF8.GetBytes(secret);
-
-        if (keyBytes.Length < 32)
-            throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
+        byte[] keyBytes = GetKeyBytes();
 
         TokenValidationParameters? validationParameters = new()
         {
@@ -195,6 +187,20 @@ public class JwtService(
             return Convert.FromBase64String(s);
         }
         catch { return null; }
+    }
+
+    // Add this private method to your JwtService
+    private byte[] GetKeyBytes()
+    {
+        string secret = _configuration.GetRequiredSetting("Jwt:JwtSecretKey");
+
+        // Use the original helper logic, but ensure it's called consistently.
+        byte[] keyBytes = Encoding.UTF8.GetBytes(secret);
+
+        if (keyBytes.Length < 32)
+            throw new InvalidOperationException("Jwt:JwtSecretKey must be at least 32 bytes (256-bit).");
+
+        return keyBytes;
     }
     #endregion
 }

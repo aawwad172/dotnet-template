@@ -73,9 +73,9 @@ public class LogoutCommandHandler(
             // Mark the User as updated (optional, but good practice)
             user.UpdatedAt = DateTime.UtcNow;
             // Update the token entity in the repository.
-            await _refreshTokenRepository.UpdateAsync(token!);
+            _refreshTokenRepository.Update(token!);
             // Persist user changes as well (ensures persistence even if retrieved AsNoTracking)
-            await _userRepository.UpdateAsync(user);
+            _userRepository.Update(user);
 
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitAsync();
