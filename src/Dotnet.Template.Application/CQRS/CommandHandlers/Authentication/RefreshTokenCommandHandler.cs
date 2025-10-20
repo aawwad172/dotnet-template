@@ -35,6 +35,9 @@ public class RefreshTokenCommandHandler(
         if (user is null)
             throw new NotFoundException("User not found");
 
+        if (oldToken.SecurityStampAtIssue != user.SecurityStamp)
+            throw new UnauthenticatedException("Session security has been compromised. Please log in again.");
+
         await _unitOfWork.BeginTransactionAsync();
         try
         {

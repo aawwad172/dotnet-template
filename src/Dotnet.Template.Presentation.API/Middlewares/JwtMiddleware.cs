@@ -2,7 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 using Dotnet.Template.Application.Services;
+using Dotnet.Template.Domain.Exceptions;
 using Dotnet.Template.Domain.Interfaces.Application.Services;
+
+using Microsoft.IdentityModel.Tokens;
 
 namespace Dotnet.Template.Presentation.API.Middlewares;
 
@@ -32,50 +35,69 @@ public class JwtMiddleware(
         string? token = context.Request.Headers["Authorization"]
             .FirstOrDefault()?.Split(" ").Last();
 
-        if (!string.IsNullOrEmpty(token))
+        if (string.IsNullOrEmpty(token))
         {
-            try
+            await _next(context);
+        }
+
+        try
+        {
+            ClaimsPrincipal? principal = await _jwtService.ValidateToken(token!);
+            if (principal is not null)
             {
-                ClaimsPrincipal? principal = await _jwtService.ValidateToken(token);
-                if (principal is not null)
+                context.User = principal;
+
+
+                // Try the short alias ('nameid') which is the standard JWT name for the ID.
+                string? userId = principal.FindFirst(JwtRegisteredClaimNames.NameId)?.Value
+                                 // Fallback to other common aliases if needed
+                                 ?? principal.FindFirst("sub")?.Value
+                                 ?? principal.FindFirst("id")?.Value;
+
+                // If you want to keep the .NET URI constant, ensure you check that too:
+                userId ??= principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    context.User = principal;
+                    currentUser.UserId = Guid.Parse(userId);
+                }
+            }
+        }
+        catch (UnauthenticatedException ex)
+        {
+            // Token is expired but we can still extract claims for refresh flow
+            if (ex.Message.Contains("Invalid token") || ex.InnerException is SecurityTokenExpiredException)
+            {
+                try
+                {
+                    // Read token without validation to extract claims
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
 
-
-                    // Try the short alias ('nameid') which is the standard JWT name for the ID.
-                    string? userId = principal.FindFirst(JwtRegisteredClaimNames.NameId)?.Value
-                                     // Fallback to other common aliases if needed
-                                     ?? principal.FindFirst("sub")?.Value
-                                     ?? principal.FindFirst("id")?.Value;
-
-                    // If you want to keep the .NET URI constant, ensure you check that too:
-                    userId ??= principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    string? userId = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value
+                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
                     if (!string.IsNullOrEmpty(userId))
                     {
                         currentUser.UserId = Guid.Parse(userId);
+                        _logger.LogDebug("Extracted userId from expired token for refresh flow");
                     }
                 }
+                catch (Exception readEx)
+                {
+                    _logger.LogWarning(readEx, "Failed to extract claims from invalid token");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Failed to validate JWT token");
+                _logger.LogWarning(ex, "Authentication failed");
             }
         }
-        else
+        catch (Exception ex)
         {
-            // Optionally: if another authentication middleware populated context.User
-            // populate currentUser from context.User (useful if you call UseAuthentication earlier)
-            if (context.User?.Identity?.IsAuthenticated == true)
-            {
-                var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                             ?? context.User.FindFirst("sub")?.Value
-                             ?? context.User.FindFirst("id")?.Value;
-                if (!string.IsNullOrEmpty(userId) && currentUser is CurrentUserService impl)
-                    impl.UserId = Guid.Parse(userId);
-            }
+            _logger.LogError(ex, "Failed to validate JWT token");
         }
-
         await _next(context);
     }
 }
