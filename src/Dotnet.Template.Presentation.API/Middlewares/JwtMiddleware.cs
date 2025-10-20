@@ -38,6 +38,7 @@ public class JwtMiddleware(
         if (string.IsNullOrEmpty(token))
         {
             await _next(context);
+            return;
         }
 
         try
@@ -76,7 +77,8 @@ public class JwtMiddleware(
 
                     string? userId = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value
                                      ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
-                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value
+                                     ?? jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
                     if (!string.IsNullOrEmpty(userId))
                     {
