@@ -1,44 +1,47 @@
-using Microsoft.OpenApi.Models;
-namespace Dotnet.Template.Presentation.API.Configurations;
+// TODO: Re-enable this Swagger authentication configuration once breaking changes from .NET 10 upgrade are resolved.
 
-public static class SwaggerAuthExtension
-{
-    public static IServiceCollection AddSwaggerAuth(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Dotnet Template API",
-                Version = "v1"
-            });
+// using Microsoft.OpenApi;
 
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please insert token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
+// namespace Dotnet.Template.Presentation.API.Configurations;
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    new string[] { }
-                }
-            });
-        });
+// public static class SwaggerAuthExtension
+// {
+//     public static IServiceCollection AddSwaggerAuth(this IServiceCollection services)
+//     {
+//         services.AddSwaggerGen(c =>
+//         {
+//             c.SwaggerDoc("v1", new OpenApiInfo
+//             {
+//                 Title = "Dotnet Template API",
+//                 Version = "v1"
+//             });
 
-        return services;
-    }
-}
+//             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//             {
+//                 In = ParameterLocation.Header,
+//                 Description = "Please insert token (e.g., Bearer <token>)",
+//                 Name = "Authorization",
+//                 Type = SecuritySchemeType.Http,
+//                 BearerFormat = "JWT",
+//                 Scheme = "bearer"
+//             });
+
+//             c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+//             {
+//                 {
+//                     new OpenApiSecurityScheme
+//                     {
+//                         Reference = new OpenApiReference
+//                         {
+//                             Type = ReferenceType.SecurityScheme,
+//                             Id = "Bearer"
+//                         }
+//                     },
+//                     Array.Empty<string>()
+//                 }
+//             });
+//         });
+
+//         return services;
+//     }
+// }
