@@ -1,3 +1,5 @@
+// TODO: Re-enable this Swagger authentication configuration once breaking changes from .NET 10 upgrade are resolved.
+
 // using Microsoft.OpenApi;
 
 // namespace Dotnet.Template.Presentation.API.Configurations;
