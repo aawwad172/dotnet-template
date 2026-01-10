@@ -4,7 +4,7 @@ using Dotnet.Template.Application.Utilities;
 using Dotnet.Template.Domain;
 using Dotnet.Template.Infrastructure;
 using Dotnet.Template.Presentation.API;
-using Dotnet.Template.Presentation.API.Configurations;
+// using Dotnet.Template.Presentation.API.Configurations;
 using Dotnet.Template.Presentation.API.Middlewares;
 using Dotnet.Template.Presentation.API.Models;
 using Dotnet.Template.Presentation.API.Routes.Authentication;
@@ -19,7 +19,7 @@ builder.Services.AddHealthChecks()
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSwaggerAuth();
+// builder.Services.AddSwaggerAuth();
 
 builder.Services.AddDomain()
                 .AddApplication()
@@ -38,18 +38,18 @@ app.MapHealthChecks("/health");
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.DocumentTitle = "Dotnet Template API");
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet Template API v1");
+        c.DocumentTitle = "Dotnet Template API";
+    });
 }
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dotnet Template API v1");
-    c.DocumentTitle = "Dotnet Template API";
-});
+
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<JwtMiddleware>();
 

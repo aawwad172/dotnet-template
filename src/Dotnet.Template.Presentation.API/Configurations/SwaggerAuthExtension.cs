@@ -1,44 +1,45 @@
-using Microsoft.OpenApi.Models;
-namespace Dotnet.Template.Presentation.API.Configurations;
+// using Microsoft.OpenApi;
 
-public static class SwaggerAuthExtension
-{
-    public static IServiceCollection AddSwaggerAuth(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Dotnet Template API",
-                Version = "v1"
-            });
+// namespace Dotnet.Template.Presentation.API.Configurations;
 
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please insert token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
+// public static class SwaggerAuthExtension
+// {
+//     public static IServiceCollection AddSwaggerAuth(this IServiceCollection services)
+//     {
+//         services.AddSwaggerGen(c =>
+//         {
+//             c.SwaggerDoc("v1", new OpenApiInfo
+//             {
+//                 Title = "Dotnet Template API",
+//                 Version = "v1"
+//             });
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    new string[] { }
-                }
-            });
-        });
+//             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//             {
+//                 In = ParameterLocation.Header,
+//                 Description = "Please insert token (e.g., Bearer <token>)",
+//                 Name = "Authorization",
+//                 Type = SecuritySchemeType.Http,
+//                 BearerFormat = "JWT",
+//                 Scheme = "bearer"
+//             });
 
-        return services;
-    }
-}
+//             c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+//             {
+//                 {
+//                     new OpenApiSecurityScheme
+//                     {
+//                         Reference = new OpenApiReference
+//                         {
+//                             Type = ReferenceType.SecurityScheme,
+//                             Id = "Bearer"
+//                         }
+//                     },
+//                     Array.Empty<string>()
+//                 }
+//             });
+//         });
+
+//         return services;
+//     }
+// }
