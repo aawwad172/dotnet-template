@@ -1,0 +1,28 @@
+# Dockerfile.dev for local development
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+# Install OS deps: make, Node.js, npm for Husky and dotnet tools
+RUN apt-get update && \
+    apt-get install -y make curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+# Copy all files and restore (preserves correct paths)
+COPY . ./
+
+# Restore NuGet packages and .NET local tools
+RUN dotnet restore
+RUN dotnet tool restore
+
+# Initialize npm and install Husky hooks
+RUN npm init -y \
+    && npm install husky --no-save \
+    && npx husky install
+
+# Expose API port 80
+
+# Default entrypoint: watch & run your API
+ENTRYPOINT ["bash", "-lc", "make database-update && dotnet watch run --project src/Dotnet.Template.Presentation.API --urls=http://0.0.0.0:80"]

@@ -13,6 +13,9 @@
 *.userosscache
 *.sln.docstates
 
+#docker
+*.override*
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

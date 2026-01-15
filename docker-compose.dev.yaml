@@ -1,0 +1,38 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: dotnet-template-api-dev
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DbConnectionString=${DB_CONNECTION}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__JwtSecretKey=${JWT_SECRET_KEY}
+      - Jwt__AccessTokenExpirationMinutes=${ACCESS_TOKEN_EXPIRATION_MINUTES}
+      - Jwt__RefreshTokenExpirationDays=${REFRESH_TOKEN_EXPIRATION_DAYS}
+      - Security__EncryptionKey=${ENCRYPTION_KEY}
+      - Security__SystemAdminPassword=${SYSTEM_ADMIN_PASSWORD}
+    volumes:
+      - ./:/src # live code sync
+      - ~/.nuget/packages:/root/.nuget/packages
+      - ~/.npm:/root/.npm # cache npm
+    depends_on:
+      - postgres
+
+  postgres:
+    # same as your production service
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

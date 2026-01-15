@@ -1,6 +1,6 @@
 # Dotnet Template
 
-This is a .NET template built using Domain-Driven Design (DDD) with Clean Architecture. It is designed to help you quickly set up an application with the following layers and patterns:
+This is a .NET template built using Domain-Driven Design (DDD) with Clean Architecture. This repository includes everything you need to get up and running, including Docker and Docker Compose configurations—no need to install or manage PostgreSQL locally.
 
 - **Domain:** Contains your core business entities and logic.
 - **Application:** Houses use cases, CQRS command and query handlers, and application-specific services.
@@ -59,6 +59,17 @@ This is a .NET template built using Domain-Driven Design (DDD) with Clean Archit
    - For Husky (pre-commit hooks), run:
      ```bash
      npx husky-init && npm install
+
+   - Create a `.env` file
+      Create a file named `.env` in the project root (This is ignored by Git):
+     ```
+      # .env
+        DB_NAME=DotnetTemplate
+        DB_USER=sa
+        DB_PASSWORD=YourStrong!Pass123
+        DB_CONNECTION=Host=postgres;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+     ```
+     
      ```
    - Restore your .NET packages:
      ```bash
